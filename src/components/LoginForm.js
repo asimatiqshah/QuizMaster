@@ -1,8 +1,12 @@
 import axios from 'axios';
-import {useState} from 'react';
+import {Formik, Form, Field} from 'formik';
+import * as Yup from 'yup';
+import {useRef, useState} from 'react';
 import {
+  Alert,
   Image,
   ImageBackground,
+  StatusBar,
   StyleSheet,
   Text,
   TextInput,
@@ -10,29 +14,44 @@ import {
   View,
 } from 'react-native';
 
-const LoginForm = ({navigation}) => {
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
-  });
+const SigninSchema = Yup.object().shape({
+  email: Yup.string()
+    .email('Invalid email')
+    .required('Please Enter Your Email'),
+  password: Yup.string()
+    .min(8)
+    .required('Please Provide Your Password')
+    .matches(
+      /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/,
+      '"Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters'
+    ),
+});
 
-  const handlauthUser = async () => {
+const LoginForm = ({navigation}) => {
+const [formError,setFormError] = useState('');
+
+  const handlauthUser = async (formdata) => {
+
+    let {email,password} = formdata; 
     try {
+      console.log(email,password);
       let result = await axios.post('http://192.168.10.52:8080/quiz/login', {
-        email: form.email,
-        password: form.password,
+        email: email,
+        password: password,
       });
-      if(result.data.status){
-        navigation.navigate('HomeScreen')
+      if (result.data.status) {
+        navigation.navigate('HomeScreen');
       }
     } catch (error) {
-      console.log(error.response.data)
+      console.log(error.response.data);
+      setFormError(error.response.data.message);
       //Reference for handling error in async await : https://rapidapi.com/guides/handle-axios-errors
     }
   };
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" />
       <ImageBackground
         resizeMode="stretch"
         source={require('../images/shape.png')}
@@ -51,48 +70,78 @@ const LoginForm = ({navigation}) => {
         style={{marginTop: 20, justifyContent: 'center', alignItems: 'center'}}>
         <Text style={styles.displayHeading1}>Sign in to continue</Text>
       </View>
-      <View>
-        <TextInput
-          onChangeText={val => setForm({...form, email: val})}
-          value={form.email}
-          placeholder="Email Address"
-          style={{
-            width: '85%',
-            fontSize: 20,
-            borderRadius: 10,
-            alignSelf: 'center',
-            paddingLeft: 20,
-            marginTop: 30,
-            height: 68,
-            backgroundColor: 'white',
-            borderColor: 'gray',
-            borderWidth: 1,
-            color: 'black',
-          }}
-        />
-        <TextInput
-          onChangeText={val => setForm({...form, password: val})}
-          value={form.password}
-          placeholder="Password"
-          style={{
-            width: '85%',
-            fontSize: 20,
-            borderRadius: 10,
-            alignSelf: 'center',
-            paddingLeft: 20,
-            marginTop: 30,
-            height: 68,
-            backgroundColor: 'white',
-            borderColor: 'gray',
-            borderWidth: 1,
-            color: 'black',
-          }}
-        />
-        <TouchableOpacity onPress={handlauthUser} style={styles.darkBtn}>
-          <Text style={styles.headingBtn}>Sign In</Text>
-        </TouchableOpacity>
-        <Text>{form.password}</Text>
-      </View>
+      <Formik
+        initialValues={{
+          email: '',
+          password: '',
+        }}
+        validationSchema={SigninSchema}
+        onSubmit={(values)=>Alert.alert(JSON.stringify(values))}
+        >
+        {({
+          values,
+          errors,
+          handleChange,
+          setFieldTouched,
+          isValid,
+          touched,
+          handleSubmit,
+        }) => (
+          <View>
+            <TextInput
+              value={values.email}
+              onChangeText={handleChange('email')}
+              onBlur={() => setFieldTouched('email')}
+              autoCapitalize={false}
+              placeholder="Email Address"
+              style={{
+                width: '85%',
+                fontSize: 20,
+                borderRadius: 10,
+                alignSelf: 'center',
+                paddingLeft: 20,
+                marginTop: 30,
+                height: 68,
+                backgroundColor: 'white',
+                borderColor: 'gray',
+                borderWidth: 1,
+                color: 'black',
+              }}
+            />
+            {touched.email && errors.email && <Text style={styles.fault_red_16}>{errors.email}</Text>}
+            <TextInput
+              value={values.password}
+              onChangeText={handleChange('password')}
+              onBlur={() => setFieldTouched('password')}
+              autoCapitalize={false}
+              placeholder="Password"
+              style={{
+                width: '85%',
+                fontSize: 20,
+                borderRadius: 10,
+                alignSelf: 'center',
+                paddingLeft: 20,
+                marginTop: 30,
+                height: 68,
+                backgroundColor: 'white',
+                borderColor: 'gray',
+                borderWidth: 1,
+                color: 'black',
+              }}
+            />
+            {touched.password && errors.password && (
+              <Text style={styles.fault_red_16}>{errors.password}</Text>
+            )}
+            <TouchableOpacity
+              disabled={!isValid}
+              onPress={()=>handlauthUser(values)}
+              style={[styles.darkBtn,{backgroundColor:isValid ? '#6949FE':'#A5C9CA'}]}>
+              <Text style={styles.headingBtn}>Sign In</Text>
+            </TouchableOpacity>
+            <Text style={styles.fault_red}>{formError}</Text>
+          </View>
+        )}
+      </Formik>
     </View>
   );
 };
@@ -111,7 +160,6 @@ const styles = StyleSheet.create({
   darkBtn: {
     width: 295,
     height: 68,
-    backgroundColor: '#6949FE',
     borderRadius: 10,
     borderWidth: 1,
     justifyContent: 'center',
@@ -124,4 +172,18 @@ const styles = StyleSheet.create({
     color: 'white',
     fontFamily: 'Artegra Soft Bold',
   },
+  fault_red:{
+    marginTop:20,
+    fontSize:20,
+    color:'red',
+    alignSelf:'center',
+    fontFamily: 'Artegra Soft Bold'
+  },
+  fault_red_16:{
+    marginTop:10,
+    fontSize:16,
+    color:'red',
+    paddingLeft:30,
+    fontFamily: 'Artegra Soft Bold'
+  }
 });
