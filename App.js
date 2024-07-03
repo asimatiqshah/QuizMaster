@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from "./src/components/LoginScreen";
 import LoginForm from "./src/components/LoginForm";
 import HomeScreen from "./src/components/HomeScreen"
-
+import SignupForm from "./src/components/SignupForm";
 const App=()=>{
 
   const StackNav = createNativeStackNavigator();
@@ -15,6 +15,7 @@ const App=()=>{
         <Screen name="LoginScreen" component={LoginScreen} />
         <Screen name="LoginForm" component={LoginForm} />
         <Screen name="HomeScreen" component={HomeScreen} />
+        <Screen name="SignupForm" component={SignupForm} />
       </Navigator>
     </NavigationContainer>
   )

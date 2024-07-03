@@ -25,7 +25,7 @@ const LoginScreen = ({navigation}) => {
         <TouchableOpacity onPress={()=> navigation.navigate('LoginForm')} style={styles.darkBtn}>
           <Text style={styles.headingBtn}>Sign In</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.borderBtn}>
+        <TouchableOpacity onPress={()=>navigation.navigate('SignupForm')} style={styles.borderBtn}>
           <Text style={styles.borderText}>Sign Up</Text>
         </TouchableOpacity>
       </View>
