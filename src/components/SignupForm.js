@@ -1,4 +1,7 @@
+import axios from 'axios';
 import { useState } from 'react';
+import {Formik, Form, Field} from 'formik';
+import * as Yup from 'yup';
 import {
   Image,
   ImageBackground,
@@ -11,13 +14,28 @@ import {
 import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
 
 
+const SignupSchema = Yup.object().shape({
+  name: Yup.string()
+    .min(6,'Name must be at least 6 digits')
+    .max(16,'Too long! it must be at least 16 digits')
+    .required('Please Provide Your name'),
+    email: Yup.string()
+    .email('Invalid email')
+    .required('Please Enter Your Email'),
+});
+
 const SignupForm = () => {
 
+    //handleSignupApi
+    const handleSignup = ()=>{
+    console.log("working");
+    }
+
+    //Radio Button Related
     const radioProps = [
         { label: 'Male', value: 'male' },
         { label: 'Female', value: 'female' }
       ];
-    
     const [value, setValue] = useState(0);
   return (
     <View style={styles.container}>
@@ -35,31 +53,61 @@ const SignupForm = () => {
           Join Now and Challenge Your Mind!
         </Text>
       </ImageBackground>
-      <View>
-        <TextInput placeholder="Enter Your Name" style={styles.inputStyle} />
-        <TextInput placeholder="Email Address" style={styles.inputStyle} />
-        <TextInput placeholder="Password" style={styles.inputStyle} />
-        <TextInput placeholder="Confirm Password" style={styles.inputStyle} />
-        <View style={{justifyContent:'center',alignItems:'center',marginTop:20}}>
-            <Text style={[styles.displayParagraph,{marginBottom:20}]} >Please Select Your Gender</Text>
-        <RadioForm
-        buttonSize={20}
-        buttonColor={'white'}
-        style={{paddingLeft:50}}
-        labelStyle={{fontSize: 20, color: 'white',paddingRight:50}}
-
-          radio_props={radioProps}
-          formHorizontal={true}
-          initial={0}
-          onPress={value => {
-            setValue(value);
-          }}
-        />
-        </View>
-        <TouchableOpacity style={styles.darkBtn}>
-          <Text style={styles.headingBtn}>Sign Up</Text>
-        </TouchableOpacity>
-      </View>
+        <Formik
+        validationSchema={SignupSchema}
+        initialValues={{
+          name: '',
+          email: '',
+          password:'',
+          confirmPassword:'',
+          gender:'',
+          role:''
+        }}
+        >
+          {({
+          values,
+          errors,
+          handleChange,
+          setFieldTouched,
+          isValid,
+          touched
+        }) => (
+             <View>
+             <TextInput
+             value={values.name}
+             onChangeText={handleChange('name')}
+             autoCapitalize={false}
+             placeholder="Enter Your Name" style={styles.inputStyle}
+             />
+             {errors.name && (
+              <Text>{errors.name}</Text>
+             )}
+             <TextInput placeholder="Email Address" style={styles.inputStyle} />
+             <TextInput placeholder="Password" style={styles.inputStyle} />
+             <TextInput placeholder="Confirm Password" style={styles.inputStyle} />
+             <View style={{justifyContent:'center',alignItems:'center',marginTop:20}}>
+                 <Text style={[styles.displayParagraph,{marginBottom:20}]} >Please Select Your Gender</Text>
+             <RadioForm
+             buttonSize={20}
+             buttonColor={'white'}
+             style={{paddingLeft:50}}
+             labelStyle={{fontSize: 20, color: 'white',paddingRight:50}}
+ 
+               radio_props={radioProps}
+               formHorizontal={true}
+               initial={0}
+               onPress={value => {
+                 setValue(value);
+               }}
+             />
+             </View>
+             <TouchableOpacity onPress={()=>handleSignup} style={styles.darkBtn}>
+               <Text style={styles.headingBtn}>Sign Up</Text>
+             </TouchableOpacity>
+           </View>
+          )}
+         
+        </Formik>
     </View>
   );
 };
