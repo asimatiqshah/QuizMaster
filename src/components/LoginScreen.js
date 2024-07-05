@@ -1,5 +1,13 @@
-import {Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-
+import {
+  Button,
+  Image,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {showMessage, hideMessage} from 'react-native-flash-message';
 const LoginScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
@@ -17,18 +25,24 @@ const LoginScreen = ({navigation}) => {
           style={{width: 198, height: 176}}
         />
       </ImageBackground>
-      <View style={{marginTop:20,justifyContent:'center',alignItems:'center'}}>
+      <View
+        style={{marginTop: 20, justifyContent: 'center', alignItems: 'center'}}>
         <Text style={styles.displayHeading1}>Let's Play!</Text>
         <Text style={styles.heading1}>Play now and Level up</Text>
       </View>
-      <View style={{justifyContent:'center',alignItems:'center'}}>
-        <TouchableOpacity onPress={()=> navigation.navigate('LoginForm')} style={styles.darkBtn}>
+      <View style={{justifyContent: 'center', alignItems: 'center'}}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('LoginForm')}
+          style={styles.darkBtn}>
           <Text style={styles.headingBtn}>Sign In</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={()=>navigation.navigate('SignupForm')} style={styles.borderBtn}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('SignupForm')}
+          style={styles.borderBtn}>
           <Text style={styles.borderText}>Sign Up</Text>
         </TouchableOpacity>
       </View>
+
     </View>
   );
 };
@@ -42,41 +56,41 @@ const styles = StyleSheet.create({
   displayHeading1: {
     fontSize: 40,
     color: 'white',
-    fontFamily:'Artegra Soft Bold'
+    fontFamily: 'Artegra Soft Bold',
   },
   heading1: {
     fontSize: 26,
     color: 'white',
-    fontFamily:"Artegra Soft Light"
+    fontFamily: 'Artegra Soft Light',
   },
-  darkBtn:{
-    width:295,
-    height:68,
-    backgroundColor:'#6949FE',
+  darkBtn: {
+    width: 295,
+    height: 68,
+    backgroundColor: '#6949FE',
     borderRadius: 10,
     borderWidth: 1,
-    justifyContent:'center',
-    alignItems:'center',
-    marginTop:40
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 40,
   },
   headingBtn: {
     fontSize: 26,
     color: 'white',
-    fontFamily:"Artegra Soft Bold"
+    fontFamily: 'Artegra Soft Bold',
   },
-  borderBtn:{
-    width:295,
-    height:68,
+  borderBtn: {
+    width: 295,
+    height: 68,
     borderColor: '#6949FE',
     borderRadius: 10,
     borderWidth: 1,
-    justifyContent:'center',
-    alignItems:'center',
-    marginTop:20
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
   },
   borderText: {
     fontSize: 26,
     color: 'white',
-    fontFamily:"Artegra Soft Bold"
-  }
+    fontFamily: 'Artegra Soft Bold',
+  },
 });

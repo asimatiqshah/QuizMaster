@@ -20,11 +20,7 @@ const SigninSchema = Yup.object().shape({
     .required('Please Enter Your Email'),
   password: Yup.string()
     .min(8)
-    .required('Please Provide Your Password')
-    .matches(
-      /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/,
-      '"Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters'
-    ),
+    .required('Please Provide Your Password'),
 });
 
 const LoginForm = ({navigation}) => {
