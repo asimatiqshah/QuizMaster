@@ -1,3 +1,5 @@
+import axios from 'axios';
+import {useEffect, useState} from 'react';
 import {
   Image,
   ImageBackground,
@@ -7,118 +9,67 @@ import {
   View,
 } from 'react-native';
 
-const HomeScreen = () => {
+const HomeScreen = ({navigation}) => {
+  const [title, setTitle] = useState([]);
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    let result = await axios.get(
+      'http://192.168.10.28:8080/quiz/categoryShow',
+    );
+    setTitle(result.data.data);
+    console.log(result.data);
+    console.log('working');
+  };
+
   return (
     <ImageBackground
       source={require('../images/fullimage.jpg')}
       resizeMode="cover"
       style={styles.bg_full}>
-      <View style={{paddingHorizontal:25,marginBottom:40,marginTop:30}}>
+      <View style={{paddingHorizontal: 25, marginBottom: 40, marginTop: 30}}>
         <Text style={styles.displayHeading1}>Category</Text>
         <Text style={styles.heading2}>Choose a category to start playing</Text>
       </View>
       <View style={{flex: 1, flexWrap: 'wrap', flexDirection: 'row'}}>
         {/* Box 1*/}
-        <View style={{flexBasis: '50%',alignItems:'center',paddingTop:20}}>
-          <ImageBackground
-            source={require('../images/knowladge.png')}
-            resizeMode="contain"
-            style={{
-              width: 156,
-              height: 152,
-              paddingHorizontal: 10,
-              paddingTop: 10,
-            }}>
-            <Image
-              source={require('../images/world.jpg')}
-              style={{
-                width: 80,
-                height: 51,
-                borderRadius: 10,
-                borderWidth: 2,
-                borderColor: '#fff',
-                alignSelf: 'flex-end',
-              }}
-            />
-            <Text style={styles.smallHeading}>Quiz</Text>
-            <Text style={styles.heading2}>General Knowladge</Text>
-          </ImageBackground>
-        </View>
-        <View style={{flexBasis: '50%',alignItems:'center',paddingTop:45}}>
-          <ImageBackground
-            source={require('../images/knowladge.png')}
-            resizeMode="contain"
-            style={{
-              width: 156,
-              height: 152,
-              paddingHorizontal: 10,
-              paddingTop: 10,
-            }}>
-            <Image
-              source={require('../images/world.jpg')}
-              style={{
-                width: 80,
-                height: 51,
-                borderRadius: 10,
-                borderWidth: 2,
-                borderColor: '#fff',
-                alignSelf: 'flex-end',
-              }}
-            />
-            <Text style={styles.smallHeading}>Quiz</Text>
-            <Text style={styles.heading2}>General Knowladge</Text>
-          </ImageBackground>
-        </View>
-        <View style={{flexBasis: '50%',alignItems:'center',paddingTop:20}}>
-          <ImageBackground
-            source={require('../images/knowladge.png')}
-            resizeMode="contain"
-            style={{
-              width: 156,
-              height: 152,
-              paddingHorizontal: 10,
-              paddingTop: 10,
-            }}>
-            <Image
-              source={require('../images/world.jpg')}
-              style={{
-                width: 80,
-                height: 51,
-                borderRadius: 10,
-                borderWidth: 2,
-                borderColor: '#fff',
-                alignSelf: 'flex-end',
-              }}
-            />
-            <Text style={styles.smallHeading}>Quiz</Text>
-            <Text style={styles.heading2}>General Knowladge</Text>
-          </ImageBackground>
-        </View>
-        <View style={{flexBasis: '50%',alignItems:'center',paddingTop:50}}>
-          <ImageBackground
-            source={require('../images/knowladge.png')}
-            resizeMode="contain"
-            style={{
-              width: 156,
-              height: 152,
-              paddingHorizontal: 10,
-              paddingTop: 10,
-            }}>
-            <Image
-              source={require('../images/world.jpg')}
-              style={{
-                width: 80,
-                height: 51,
-                borderRadius: 10,
-                borderWidth: 2,
-                borderColor: '#fff',
-                alignSelf: 'flex-end',
-              }}
-            />
-            <Text style={styles.smallHeading}>Quiz</Text>
-            <Text style={styles.heading2}>General Knowladge</Text>
-          </ImageBackground>
-        </View>
+
+        {title.map((item, index) => {
+          return (
+            <TouchableOpacity
+            key={item._id}
+            onPress={()=>{
+              navigation.navigate('QuestionsScreen',{item});
+            }}
+              style={{flexBasis: '50%', alignItems: 'center', paddingTop: 20}}>
+              <ImageBackground
+                source={require('../images/knowladge.png')}
+                resizeMode="contain"
+                style={{
+                  width: 156,
+                  height: 152,
+                  paddingHorizontal: 10,
+                  paddingTop: 10,
+                }}>
+                <Image
+                  source={require('../images/world.jpg')}
+                  style={{
+                    width: 80,
+                    height: 51,
+                    borderRadius: 10,
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                    alignSelf: 'flex-end',
+                  }}
+                />
+                {/* <Text style={styles.smallHeading}>Quiz</Text>
+                <Text style={styles.heading2}>{item.category}</Text> */}
+              </ImageBackground>
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </ImageBackground>
   );

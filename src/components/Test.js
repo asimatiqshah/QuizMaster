@@ -157,8 +157,7 @@ const Test = () => {
 
   const nextQuestions = ()=>{
     const next = currentPage + 1;
-    const ques = next * question_per_page;
-    
+    const ques = next * question_per_page; 
   }
 
   const getCurrentQuestions=()=>{

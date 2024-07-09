@@ -1,0 +1,25 @@
+<View style={{flexBasis: '50%',alignItems:'center',paddingTop:45}}>
+          <ImageBackground
+            source={require('../images/knowladge.png')}
+            resizeMode="contain"
+            style={{
+              width: 156,
+              height: 152,
+              paddingHorizontal: 10,
+              paddingTop: 10,
+            }}>
+            <Image
+              source={require('../images/world.jpg')}
+              style={{
+                width: 80,
+                height: 51,
+                borderRadius: 10,
+                borderWidth: 2,
+                borderColor: '#fff',
+                alignSelf: 'flex-end',
+              }}
+            />
+            <Text style={styles.smallHeading}>Quiz</Text>
+            <Text style={styles.heading2}>General Knowladge</Text>
+          </ImageBackground>
+        </View>

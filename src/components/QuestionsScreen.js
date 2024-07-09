@@ -7,7 +7,9 @@ import {
   View,
 } from 'react-native';
 
-const QuestionsScreen = () => {
+const QuestionsScreen = ({route}) => {
+  const { item } = route.params;
+  console.log(item);
   return (
     <ImageBackground
       source={require('../images/fullimage.jpg')}
