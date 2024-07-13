@@ -12,16 +12,19 @@ import {
 const HomeScreen = ({navigation}) => {
   const [title, setTitle] = useState([]);
   useEffect(() => {
+    console.log("Working");
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    let result = await axios.get(
-      'http://192.168.10.28:8080/quiz/categoryShow',
-    );
-    setTitle(result.data.data);
-    console.log(result.data);
-    console.log('working');
+    try {
+      let result = await axios.get(
+        'https://quiz-node-js.vercel.app/quiz/categoryShow',
+      );
+      setTitle(result.data.data);
+    } catch (error) {
+      console.log(error.response.data);
+    }
   };
 
   return (
@@ -30,13 +33,21 @@ const HomeScreen = ({navigation}) => {
       resizeMode="cover"
       style={styles.bg_full}>
       <View style={{paddingHorizontal: 25, marginBottom: 40, marginTop: 30}}>
-        <Text style={styles.displayHeading1}>Category</Text>
+        <Text style={styles.displayHeading1}>Category1</Text>
         <Text style={styles.heading2}>Choose a category to start playing</Text>
       </View>
       <View style={{flex: 1, flexWrap: 'wrap', flexDirection: 'row'}}>
         {/* Box 1*/}
 
         {title.map((item, index) => {
+          //MAKE CATEGORY CAPITAL CASE AND REMOVE DASH WITH SPACE
+          //======================================================
+          // 1.Split the string by underscores.
+          // 2.Capitalize the first letter of each word.
+          // 3.Join the words with spaces.
+         const cat = item.category_name.split('_');
+         let toUpper = cat.map((word)=>word.toUpperCase());
+         const mergeCat = toUpper.join(' ');
           return (
             <TouchableOpacity
             key={item._id}
@@ -64,8 +75,8 @@ const HomeScreen = ({navigation}) => {
                     alignSelf: 'flex-end',
                   }}
                 />
-                {/* <Text style={styles.smallHeading}>Quiz</Text>
-                <Text style={styles.heading2}>{item.category}</Text> */}
+                <Text style={styles.smallHeading}>Quiz</Text>
+                <Text style={styles.heading2}>{mergeCat}</Text>
               </ImageBackground>
             </TouchableOpacity>
           );

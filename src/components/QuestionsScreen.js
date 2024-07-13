@@ -1,4 +1,7 @@
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import {
+  Button,
   Image,
   ImageBackground,
   StyleSheet,
@@ -7,82 +10,56 @@ import {
   View,
 } from 'react-native';
 
-const QuestionsScreen = ({route}) => {
+const QuestionsScreen = ({ route }) => {
   const { item } = route.params;
-  console.log(item);
-  return (
-    <ImageBackground
-      source={require('../images/fullimage.jpg')}
-      resizeMode="cover"
-      style={styles.bg_full}>
-      <View style={{paddingHorizontal: 25, marginBottom: 20, marginTop: 30}}>
-        <Text style={[styles.heading2, {color: '#37E9BB'}]}>05/15</Text>
-        <Text style={styles.heading1}>Where is the Taj Mahal located?</Text>
-      </View>
-      <Image
-        source={require('../images/tajmahal.jpg')}
-        style={{
-          width: 304,
-          height: 214,
-          borderRadius: 10,
-          borderWidth: 2,
-          alignSelf: 'center',
-          borderColor: '#ffff',
-        }}
-      />
-      {/* Bullets */}
-      <View
-        style={{justifyContent: 'center', alignItems: 'center', marginTop: 20}}>
-        <View style={{flexDirection: 'row', paddingVertical: 10}}>
-          <Image
-            source={require('../images/num_01.png')}
-            style={{width: 50, height: 50}}
-          />
-          <Text style={[styles.heading2, {paddingLeft: 20}]}>
-            London,United Kingdom
-          </Text>
-        </View>
-        <View style={{flexDirection: 'row', paddingVertical: 10}}>
-          <Image
-            source={require('../images/num_01.png')}
-            style={{width: 50, height: 50}}
-          />
-          <Text style={[styles.heading2, {paddingLeft: 20}]}>
-            London,United Kingdom
-          </Text>
-        </View>
-        <View style={{flexDirection: 'row', paddingVertical: 10}}>
-          <Image
-            source={require('../images/num_01.png')}
-            style={{width: 50, height: 50}}
-          />
-          <Text style={[styles.heading2, {paddingLeft: 20}]}>
-            London,United Kingdom
-          </Text>
-        </View>
-        <View style={{flexDirection: 'row', paddingVertical: 10}}>
-          <Image
-            source={require('../images/num_01.png')}
-            style={{width: 50, height: 50}}
-          />
-          <Text style={[styles.heading2, {paddingLeft: 20}]}>
-            London,United Kingdom
-          </Text>
-        </View>
-      </View>
+  const [question, setQuestion] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const question_per_page = 1;
 
-      {/* Buttons */}
-      <View style={{position: 'absolute', bottom: 0,width:'100%'}}>
-        <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-          <TouchableOpacity style={{}}>
-            <Image source={require('../images/prev.png')} />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Image source={require('../images/next.png')} />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ImageBackground>
+  useEffect(() => {
+    fetchData();
+  },[])
+
+
+  const fetchData = async () => {
+    try {
+      let result = await axios.post('https://quiz-node-js.vercel.app/quiz/category-related-questions', {
+        category_id: "668d35180f36ef56242c5d27"
+      });
+      setQuestion(result.data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getCurrentQuestions = () => {
+    const startIndex = currentPage * question_per_page;
+    const endIndex = startIndex + question_per_page;
+    let result = question.slice(startIndex, endIndex);
+    console.log(result);
+    return result;
+  }
+
+  const nextQuestions=()=>{
+    if((currentPage + 1) < question.length){
+      const next = currentPage + 1;
+      setCurrentPage(next);
+    }
+  }
+
+  return (
+    <View>
+      {
+        question && getCurrentQuestions().map((record, index) => {
+          return (
+              <View key={index}>
+                <Text>{record.question}</Text>
+              </View>
+          )
+        })
+      }
+      <Button title='Next' onPress={()=>nextQuestions()} />
+    </View>
   );
 };
 export default QuestionsScreen;
