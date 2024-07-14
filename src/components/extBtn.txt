@@ -69,4 +69,33 @@
           </TouchableOpacity>
         </View>
       </View>
-    </ImageBackground>
+</ImageBackground>
+
+
+
+
+<View>
+        {
+          question && getCurrentQuestions().map((record, index) => {
+            return (
+              <View key={index}>
+                <Text>{record.question}</Text>
+              </View>
+            )
+          })
+        }
+        <Button disabled={(currentPage + 1) >= question.length} title='Next'  />
+      </View>
+
+
+
+
+   <View style={{ flexDirection: 'row', paddingVertical: 10 }}>
+            <Image
+              source={require('../images/num_01.png')}
+              style={{ width: 50, height: 50 }}
+            />
+            <Text style={[styles.heading2, { paddingLeft: 20 }]}>
+              London,United Kingdom
+            </Text>
+          </View>

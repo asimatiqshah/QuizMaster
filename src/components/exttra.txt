@@ -23,3 +23,10 @@
             <Text style={styles.heading2}>General Knowladge</Text>
           </ImageBackground>
         </View>
+
+
+Back Btn
+===============
+<TouchableOpacity disabled={(currentPage + 1) >= question.length} onPress={()=>nextQuestions()}>
+              <Image source={require('../images/next.png')} style={{opacity: ((currentPage + 1) >= question.length)? 0.2 : 1}} />
+            </TouchableOpacity>

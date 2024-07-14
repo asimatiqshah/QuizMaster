@@ -10,13 +10,15 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-
-const QuestionsScreen = ({ route }) => {
+import CheckBox from 'react-native-check-box';
+const QuestionsScreen = ({ route,navigation }) => {
   const { item } = route.params;
   const [question, setQuestion] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const question_per_page = 1;
-
+  const [userVal,setUserVal] = useState({});
+  const [trackReport,setTrackReport] = useState([]);
+  const [isActive,setIsActive] = useState(false); 
   useEffect(() => {
     fetchData();
   }, [])
@@ -25,7 +27,7 @@ const QuestionsScreen = ({ route }) => {
   const fetchData = async () => {
     try {
       let result = await axios.post('https://quiz-node-js.vercel.app/quiz/category-related-questions', {
-        category_id: "668d35180f36ef56242c5d27"
+        category_id: item._id
       });
       setQuestion(result.data.data);
     } catch (error) {
@@ -33,21 +35,47 @@ const QuestionsScreen = ({ route }) => {
     }
   }
 
+  const handleCheckBoxVal = (id,answer,marks)=>{
+    setIsActive(true);
+    console.log(id,answer,marks);
+    setUserVal({id,answer,marks});
+  }
+
   const getCurrentQuestions = () => {
     const startIndex = currentPage * question_per_page;
     const endIndex = startIndex + question_per_page;
     let result = question.slice(startIndex, endIndex);
-    console.log(result);
     return result;
   }
 
   const nextQuestions = () => {
-    if ((currentPage + 1) < question.length) {
-      const next = currentPage + 1;
-      setCurrentPage(next);
-    }
+  if(isActive){
+      // console.log(userVal,trackReport,isActive);
+      //Put Selected Answer in trackReport
+      trackReport.push(userVal);
+      setTrackReport([
+        ...trackReport
+      ]);
+      setIsActive(false);
+      console.log(currentPage,question.length);
+      //Check Next Page
+      if ((currentPage + 1) < question.length) {
+        const next = currentPage + 1;
+        setCurrentPage(next); 
+      }else if((currentPage + 1) == question.length){
+        console.log("go");
+        //Total Score
+        let totalResult = {
+          trackReport:trackReport,
+          total:question.length
+        }
+        navigation.navigate('ScoreScreen',{totalResult});
+      }
   }
 
+  }
+
+  //Not User Function
   const prevQuestions = ()=>{
     if((currentPage - 1) >= 0){
       const prev = currentPage - 1;
@@ -86,7 +114,7 @@ const QuestionsScreen = ({ route }) => {
                   />
                   <Text style={[styles.heading2, { paddingLeft: 20,color:'#37E9BB' }]}>
                     {record}
-                  </Text>
+                  </Text><CheckBox onClick={()=>handleCheckBoxVal(item._id,item.is_correct[index],item.question_marks)} />
                 </View>
               )
             })
@@ -110,12 +138,9 @@ const QuestionsScreen = ({ route }) => {
         }
         {/* Buttons */}
         <View style={{ position: 'absolute', bottom: 0, width: '100%' }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <TouchableOpacity disabled={currentPage == 0} onPress={()=>prevQuestions()}  style={{}}>
-              <Image source={require('../images/prev.png')} style={{opacity:( currentPage == 0 )?0.2:1}} />
-            </TouchableOpacity>
-            <TouchableOpacity disabled={(currentPage + 1) >= question.length} onPress={()=>nextQuestions()}>
-              <Image source={require('../images/next.png')} style={{opacity: ((currentPage + 1) >= question.length)? 0.2 : 1}} />
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+            <TouchableOpacity disabled={isActive?false:true} onPress={()=>nextQuestions()}>
+              <Image source={require('../images/next.png')} style={{opacity: isActive? 1 : 0.2}} />
             </TouchableOpacity>
           </View>
         </View>
