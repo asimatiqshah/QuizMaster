@@ -18,9 +18,12 @@ const QuestionsScreen = ({ route,navigation }) => {
   const question_per_page = 1;
   const [userVal,setUserVal] = useState({});
   const [trackReport,setTrackReport] = useState([]);
-  const [isActive,setIsActive] = useState(false); 
+  const [isActive,setIsActive] = useState(false);
+  const [second,setSecond] = useState();
+  const [minute,setMinute] = useState();
   useEffect(() => {
     fetchData();
+    questionTimer();
   }, [])
 
 
@@ -83,11 +86,42 @@ const QuestionsScreen = ({ route,navigation }) => {
     }
   }
 
+  const questionTimer=()=>{
+    const startTime = new Date().getTime();
+    const endTime = startTime + 60000;
+
+    //suppose 
+    //endtime is 2 minutes
+    //now is 1 second ====> because interval run after every second so now is updated to one second
+    //formula   endTime - now ===> time should be minus in millisecond
+    const countDownInterval = setInterval(()=>{
+      const now = new Date().getTime();
+      const result = endTime - now;
+      if(result <= 0 ){
+        clearInterval(countDownInterval);
+        console.log("Timesup");
+      }else{
+        //show time in easy format or human readable format
+        //we will use formals 
+        const second = Math.floor((result % (1000*60)) / 1000);
+        const minute = Math.floor((result%(1000*60*60)) / (1000*60));
+  
+
+        //put time in string format
+        setSecond(second);
+        setMinute(minute);
+      }
+    },1000)
+  }
+
   const renderItem = ({ item }) => {
     return (
       <View>
         <View style={{ paddingHorizontal: 25, marginBottom: 20, marginTop: 30 }}>
+          <View style={{flexDirection:'row',justifyContent:'space-between'}}>
           <Text style={[styles.heading2, { color: '#37E9BB' }]}>0{currentPage+1}/0{question.length}</Text>
+          <Text style={{fontSize:16,color:'red'}}>{minute <= 9 ? '0'+minute:minute}:{second <= 9 ? '0'+second:second}</Text>
+          </View>
           <Text style={styles.heading1}>{item.question}</Text>
         </View>
         <Image

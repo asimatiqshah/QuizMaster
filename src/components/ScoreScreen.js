@@ -1,33 +1,60 @@
-import { Text, View } from "react-native";
+import { ImageBackground, StyleSheet, Text, View } from "react-native";
 
-const ScoreScreen=({route})=>{
-    const {totalResult} = route.params;
-    const findCorrectAnswer = totalResult.trackReport.reduce((total,current)=>{
-        if(current['answer'] == true) total = total + 1;
+const ScoreScreen = ({ route }) => {
+    const { totalResult } = route.params;
+    const findCorrectAnswer = totalResult.trackReport.reduce((total, current) => {
+        if (current['answer'] == true) total = total + 1;
         return total;
-    },0);
+    }, 0);
 
     //Total marks
-    let count = 0;
-    const findMarks = totalResult.trackReport.reduce((total,current,index,arrray)=>{
-        if(current['answer'] == true){
-            count = total + Number(current['marks']);
-        }
-        if(index > arrray.length){
-            total['count'] = count;
-        }
-
+    const findTotalMarks = totalResult.trackReport.reduce((total, current) => {
+        total = total + Number(current['marks']);
         return total;
-    },{});
-    console.log(findMarks);
-    return(
-        <View>
-            <Text>Congrats</Text>
-            <Text>You attempted questions:{totalResult.total}/{totalResult.trackReport.length}</Text>
-            <Text>Correct Answer:{findCorrectAnswer}</Text>
-            <Text>Score secured:1</Text>
-            <Text>Time Spent:</Text>
-        </View>
+    }, 0);
+
+    //Secured Marks
+    const findSecuredMarks = totalResult.trackReport.reduce((total, current) => {
+        if (current['answer'] == true) {
+            total = total + Number(current['marks']);
+        }
+        return total;
+    }, 0);
+    return (
+        <ImageBackground source={require('../images/fullimage.jpg')} style={styles.bg_full}>
+            <ImageBackground source={(findCorrectAnswer>=3) ? require(`../images/winner_doodles.png`):require(`../images/fail.png`)} style={{width:212,height:234,justifyContent:'center',alignItems:'center',marginTop:50}}>
+                <Text style={styles.displayHeading1}>{findSecuredMarks}</Text>
+                <Text style={styles.smallHeading}>Score Secured</Text>
+                <Text style={styles.smallHeading}>Out Of {findTotalMarks}</Text>
+            </ImageBackground>
+            <Text style={styles.heading2}>Congrats</Text>
+            <Text style={styles.smallHeading}>You attempted questions: <Text style={{color:'#37E9BB'}}>{totalResult.total}</Text> / {totalResult.trackReport.length}</Text>
+            <Text style={styles.smallHeading}>Correct Answer: <Text style={{color:'#37E9BB'}} >{findCorrectAnswer}</Text></Text>
+        
+            <Text style={styles.smallHeading}>Time Spent:</Text>
+        </ImageBackground>
     )
 }
 export default ScoreScreen;
+
+const styles = StyleSheet.create({
+    bg_full:{
+        flex:1,
+        alignItems:'center'
+    },
+    displayHeading1: {
+        fontSize: 60,
+        color: 'white',
+        fontFamily: 'Artegra Soft Bold'
+      },
+      heading2: {
+        fontSize: 30,
+        color: '#37E9BB',
+        fontFamily: 'Artegra Soft Bold',
+      },
+      smallHeading: {
+        fontSize: 16,
+        color: 'white',
+        fontFamily: 'Artegra Soft Light',
+      }
+})
