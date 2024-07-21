@@ -2,6 +2,7 @@ import { ImageBackground, StyleSheet, Text, View } from "react-native";
 
 const ScoreScreen = ({ route }) => {
     const { totalResult } = route.params;
+    console.log(totalResult);
     const findCorrectAnswer = totalResult.trackReport.reduce((total, current) => {
         if (current['answer'] == true) total = total + 1;
         return total;
@@ -31,7 +32,7 @@ const ScoreScreen = ({ route }) => {
             <Text style={styles.smallHeading}>You attempted questions: <Text style={{color:'#37E9BB'}}>{totalResult.total}</Text> / {totalResult.trackReport.length}</Text>
             <Text style={styles.smallHeading}>Correct Answer: <Text style={{color:'#37E9BB'}} >{findCorrectAnswer}</Text></Text>
         
-            <Text style={styles.smallHeading}>Time Spent:</Text>
+            <Text style={styles.smallHeading}>Time Spent :<Text style={{color:'#37E9BB'}} > {totalResult.time}</Text></Text>
         </ImageBackground>
     )
 }

@@ -8,6 +8,7 @@ import FlashMessage from 'react-native-flash-message';
 import QuestionsScreen from './src/components/QuestionsScreen';
 import Test from './src/components/Test';
 import ScoreScreen from './src/components/ScoreScreen';
+import OTPScreen from './src/components/OTPScreen';
 const App = () => {
   const StackNav = createNativeStackNavigator();
   let {Navigator, Screen} = StackNav;
@@ -16,11 +17,12 @@ const App = () => {
     <>
       <NavigationContainer>
         <Navigator screenOptions={{headerShown: false}}>
+        <Screen name="OTPScreen" component={OTPScreen} />
+        <Screen name="SignupForm" component={SignupForm} />
           <Screen name="HomeScreen" component={HomeScreen} />
           <Screen name="QuestionsScreen" component={QuestionsScreen} />
           <Screen name="LoginScreen" component={LoginScreen} />
           <Screen name="LoginForm" component={LoginForm} />
-          <Screen name="SignupForm" component={SignupForm} />
           <Screen name="ScoreScreen" component={ScoreScreen} />
         </Navigator>
       </NavigationContainer>
