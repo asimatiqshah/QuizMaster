@@ -1,6 +1,6 @@
-import { ImageBackground, StyleSheet, Text, View } from "react-native";
+import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const ScoreScreen = ({ route }) => {
+const ScoreScreen = ({ route,navigation }) => {
     const { totalResult } = route.params;
     console.log(totalResult);
     const findCorrectAnswer = totalResult.trackReport.reduce((total, current) => {
@@ -23,39 +23,58 @@ const ScoreScreen = ({ route }) => {
     }, 0);
     return (
         <ImageBackground source={require('../images/fullimage.jpg')} style={styles.bg_full}>
-            <ImageBackground source={(findCorrectAnswer>=3) ? require(`../images/winner_doodles.png`):require(`../images/fail.png`)} style={{width:212,height:234,justifyContent:'center',alignItems:'center',marginTop:50}}>
+            <ImageBackground source={(findCorrectAnswer >= 3) ? require(`../images/winner_doodles.png`) : require(`../images/fail.png`)} style={{ width: 212, height: 234, justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
                 <Text style={styles.displayHeading1}>{findSecuredMarks}</Text>
                 <Text style={styles.smallHeading}>Score Secured</Text>
                 <Text style={styles.smallHeading}>Out Of {findTotalMarks}</Text>
             </ImageBackground>
             <Text style={styles.heading2}>Congrats</Text>
-            <Text style={styles.smallHeading}>You attempted questions: <Text style={{color:'#37E9BB'}}>{totalResult.total}</Text> / {totalResult.trackReport.length}</Text>
-            <Text style={styles.smallHeading}>Correct Answer: <Text style={{color:'#37E9BB'}} >{findCorrectAnswer}</Text></Text>
-        
-            <Text style={styles.smallHeading}>Time Spent :<Text style={{color:'#37E9BB'}} > {totalResult.time}</Text></Text>
+            <Text style={styles.smallHeading}>You attempted questions: <Text style={{ color: '#37E9BB' }}>{totalResult.total}</Text> / {totalResult.trackReport.length}</Text>
+            <Text style={styles.smallHeading}>Correct Answer: <Text style={{ color: '#37E9BB' }} >{findCorrectAnswer}</Text></Text>
+
+            <Text style={styles.smallHeading}>Time Spent :<Text style={{ color: '#37E9BB' }} > {totalResult.time}</Text></Text>
+            <TouchableOpacity
+                onPress={() => navigation.navigate('HomeScreen')}
+                style={[styles.darkBtn,{backgroundColor: '#6949FE'}]}>
+                <Text style={styles.headingBtn}>Go To Menu</Text>
+            </TouchableOpacity>
         </ImageBackground>
     )
 }
 export default ScoreScreen;
 
 const styles = StyleSheet.create({
-    bg_full:{
-        flex:1,
-        alignItems:'center'
+    bg_full: {
+        flex: 1,
+        alignItems: 'center'
     },
     displayHeading1: {
         fontSize: 60,
         color: 'white',
         fontFamily: 'Artegra Soft Bold'
-      },
-      heading2: {
+    },
+    heading2: {
         fontSize: 30,
         color: '#37E9BB',
         fontFamily: 'Artegra Soft Bold',
-      },
-      smallHeading: {
+    },
+    smallHeading: {
         fontSize: 16,
         color: 'white',
         fontFamily: 'Artegra Soft Light',
+    },
+    darkBtn: {
+        width: 275,
+        height: 58,
+        borderRadius: 10,
+        borderWidth: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 40,
+      },
+      headingBtn: {
+        fontSize: 26,
+        color: 'white',
+        fontFamily: 'Artegra Soft Bold',
       }
 })

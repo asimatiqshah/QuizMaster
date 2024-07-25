@@ -6,6 +6,7 @@ import {showMessage, hideMessage} from 'react-native-flash-message';
 import {
   Image,
   ImageBackground,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -68,22 +69,23 @@ const SignupForm = ({navigation}) => {
       gender: radiaVal,
       role: 'user',
     };
-
+    console.log(newObj);
     //Fetching Api
     try {
       let result = await axios.post(
-        'http://192.168.10.52:8080/quiz/signup',
+        'https://quiz-node-js.vercel.app/quiz/signup',
         newObj,
       );
       if (result.data.status) {
         successShowMsg();
         setTimeout(() => {
-          navigation.navigate('LoginForm');
+          navigation.navigate('OTPScreen');
         }, 2000);
       }
     } catch (error) {
       errorShowMsg(error.response.data);
       console.log(error.response.data);
+      console.log(error);
     }
   };
 
@@ -94,7 +96,7 @@ const SignupForm = ({navigation}) => {
   ];
   const [radiaVal, setRadiaVal] = useState('male');
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <ImageBackground
         resizeMode="stretch"
         source={require('../images/shape.png')}
@@ -197,7 +199,7 @@ const SignupForm = ({navigation}) => {
           </View>
         )}
       </Formik>
-    </View>
+    </ScrollView>
   );
 };
 export default SignupForm;

@@ -2,6 +2,8 @@ import axios from 'axios';
 import {Formik, Form, Field} from 'formik';
 import * as Yup from 'yup';
 import {useRef, useState} from 'react';
+import {showMessage, hideMessage} from 'react-native-flash-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Alert,
   Image,
@@ -26,16 +28,39 @@ const SigninSchema = Yup.object().shape({
 const LoginForm = ({navigation}) => {
 const [formError,setFormError] = useState('');
 
+  //Login Success Message
+  const successShowMsg = () => {
+    showMessage({
+      message: 'Success',
+      description: 'Congratulations, Your Are Successfully Login',
+      type: 'success',
+      icon: 'success',
+    });
+  };
+
+  const storeUser = async (result) => {
+    try {
+      await AsyncStorage.setItem('userLogin_token',JSON.stringify(result.data.data.email));
+      await AsyncStorage.setItem('isLoggenIn',JSON.stringify(true));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
   const handlauthUser = async (formdata) => {
 
     let {email,password} = formdata; 
     try {
-      console.log(email,password);
-      let result = await axios.post('http://192.168.10.52:8080/quiz/login', {
+      let result = await axios.post('https://quiz-node-js.vercel.app/quiz/login', {
         email: email,
         password: password,
       });
       if (result.data.status) {
+        storeUser(result);
+        successShowMsg();
+        // values.email='';
+        // values.password='';
         navigation.navigate('HomeScreen');
       }
     } catch (error) {

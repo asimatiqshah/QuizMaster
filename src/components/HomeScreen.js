@@ -1,5 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import {
   Image,
   ImageBackground,
@@ -9,7 +10,7 @@ import {
   View,
 } from 'react-native';
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({ navigation }) => {
   const [title, setTitle] = useState([]);
   useEffect(() => {
     console.log("Working");
@@ -27,16 +28,26 @@ const HomeScreen = ({navigation}) => {
     }
   };
 
+  const logOutHandler = async ()=>{
+    try {
+      await AsyncStorage.removeItem('userLogin_token');
+      await AsyncStorage.removeItem('isLoggenIn');
+      navigation.navigate('LoginForm');
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <ImageBackground
       source={require('../images/fullimage.jpg')}
       resizeMode="cover"
       style={styles.bg_full}>
-      <View style={{paddingHorizontal: 25, marginBottom: 40, marginTop: 30}}>
+      <View style={{ paddingHorizontal: 25, marginBottom: 40, marginTop: 30 }}>
         <Text style={styles.displayHeading1}>Category1</Text>
         <Text style={styles.heading2}>Choose a category to start playing</Text>
       </View>
-      <View style={{flex: 1, flexWrap: 'wrap', flexDirection: 'row'}}>
+      <View style={{ flex: 1, flexWrap: 'wrap', flexDirection: 'row' }}>
         {/* Box 1*/}
 
         {title.map((item, index) => {
@@ -45,16 +56,16 @@ const HomeScreen = ({navigation}) => {
           // 1.Split the string by underscores.
           // 2.Capitalize the first letter of each word.
           // 3.Join the words with spaces.
-         const cat = item.category_name.split('_');
-         let toUpper = cat.map((word)=>word.toUpperCase());
-         const mergeCat = toUpper.join(' ');
+          const cat = item.category_name.split('_');
+          let toUpper = cat.map((word) => word.toUpperCase());
+          const mergeCat = toUpper.join(' ');
           return (
             <TouchableOpacity
-            key={item._id}
-            onPress={()=>{
-              navigation.navigate('QuestionsScreen',{item});
-            }}
-              style={{flexBasis: '50%', alignItems: 'center', paddingTop: 20}}>
+              key={item._id}
+              onPress={() => {
+                navigation.navigate('QuestionsScreen', { item });
+              }}
+              style={{ flexBasis: '50%', alignItems: 'center', paddingTop: 20 }}>
               <ImageBackground
                 source={require('../images/knowladge.png')}
                 resizeMode="contain"
@@ -82,6 +93,11 @@ const HomeScreen = ({navigation}) => {
           );
         })}
       </View>
+      <TouchableOpacity
+        onPress={logOutHandler}
+        style={[styles.darkBtn, { backgroundColor: '#6949FE',marginBottom:20,alignSelf:'center' }]}>
+        <Text style={styles.headingBtn}>Log Out</Text>
+      </TouchableOpacity>
     </ImageBackground>
   );
 };
