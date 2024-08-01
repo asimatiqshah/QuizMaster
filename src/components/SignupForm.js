@@ -6,6 +6,7 @@ import {showMessage, hideMessage} from 'react-native-flash-message';
 import {
   Image,
   ImageBackground,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -79,7 +80,10 @@ const SignupForm = ({navigation}) => {
       if (result.data.status) {
         successShowMsg();
         setTimeout(() => {
-          navigation.navigate('OTPScreen');
+          navigation.navigate('OTPScreen',{
+            screen: 'OTPScreen',
+            params: { user: newObj.email },
+          });
         }, 2000);
       }
     } catch (error) {
@@ -135,6 +139,7 @@ const SignupForm = ({navigation}) => {
               onChangeText={handleChange('name')}
               autoCapitalize={false}
               placeholder="Enter Your Name"
+              placeholderTextColor="#808080"
               style={styles.inputStyle}
             />
             {  touched.name && errors.name && <Text style={styles.fault_red_16}>{errors.name}</Text>}
@@ -144,6 +149,7 @@ const SignupForm = ({navigation}) => {
               onChangeText={handleChange('email')}
               autoCapitalize={false}
               placeholder="Email Address"
+              placeholderTextColor="#808080"
               style={styles.inputStyle}
             />
             { touched.email && errors.email && <Text style={styles.fault_red_16}>{errors.email}</Text>}
@@ -153,6 +159,7 @@ const SignupForm = ({navigation}) => {
               onChangeText={handleChange('password')}
               autoCapitalize={false}
               placeholder="Password"
+              placeholderTextColor="#808080"
               style={styles.inputStyle}
             />
             { touched.password && errors.password && <Text style={styles.fault_red_16}>{errors.password}</Text>}
@@ -162,6 +169,7 @@ const SignupForm = ({navigation}) => {
               onChangeText={handleChange('confirmPassword')}
               autoCapitalize={false}
               placeholder="Confirm Password"
+              placeholderTextColor="#808080"
               style={styles.inputStyle}
             />
             { touched.confirmPassword && errors.confirmPassword && <Text style={styles.fault_red_16}>{errors.confirmPassword}</Text>}
@@ -196,6 +204,12 @@ const SignupForm = ({navigation}) => {
               ]}>
               <Text style={styles.headingBtn}>Sign Up</Text>
             </TouchableOpacity>
+            <View style={{flexDirection:'row',justifyContent:'center',marginBottom:20}}>
+              <Text>Do you have account  — </Text>
+              <Pressable onPress={() => navigation.navigate('LoginForm')}>
+                <Text style={{color:'#1877F2',fontSize:16}}> Sign In</Text>
+              </Pressable>
+            </View>
           </View>
         )}
       </Formik>
@@ -220,8 +234,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Artegra Soft Bold',
   },
   darkBtn: {
-    width: 290,
-    height: 63,
+    width: 250,
+    height: 58,
     backgroundColor: '#6949FE',
     borderRadius: 10,
     borderWidth: 1,
@@ -229,9 +243,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 30,
     alignSelf: 'center',
+    marginBottom:20
   },
   headingBtn: {
-    fontSize: 26,
+    fontSize: 24,
     color: 'white',
     fontFamily: 'Artegra Soft Bold',
   },

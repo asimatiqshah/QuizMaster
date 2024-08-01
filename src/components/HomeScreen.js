@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   Image,
   ImageBackground,
   StyleSheet,
@@ -12,8 +13,10 @@ import {
 
 const HomeScreen = ({ navigation }) => {
   const [title, setTitle] = useState([]);
+  const [isShow,setIsShow] = useState(true);
   useEffect(() => {
     console.log("Working");
+    
     fetchData();
   }, []);
 
@@ -22,7 +25,11 @@ const HomeScreen = ({ navigation }) => {
       let result = await axios.get(
         'https://quiz-node-js.vercel.app/quiz/categoryShow',
       );
-      setTitle(result.data.data);
+      if(result.data.status){
+        setIsShow(false);
+        setTitle(result.data.data);
+      }
+      
     } catch (error) {
       console.log(error.response.data);
     }
@@ -44,10 +51,10 @@ const HomeScreen = ({ navigation }) => {
       resizeMode="cover"
       style={styles.bg_full}>
       <View style={{ paddingHorizontal: 25, marginBottom: 40, marginTop: 30 }}>
-        <Text style={styles.displayHeading1}>Category1</Text>
+        <Text style={styles.displayHeading1}>Category</Text>
         <Text style={styles.heading2}>Choose a category to start playing</Text>
       </View>
-      <View style={{ flex: 1, flexWrap: 'wrap', flexDirection: 'row' }}>
+      <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
         {/* Box 1*/}
 
         {title.map((item, index) => {
@@ -93,9 +100,12 @@ const HomeScreen = ({ navigation }) => {
           );
         })}
       </View>
+      <View>
+        <ActivityIndicator size="large" animating={isShow}   />
+      </View>
       <TouchableOpacity
         onPress={logOutHandler}
-        style={[styles.darkBtn, { backgroundColor: '#6949FE',marginBottom:20,alignSelf:'center' }]}>
+        style={[styles.darkBtn, { backgroundColor: '#6949FE',marginBottom:20,alignSelf:'center',position:'absolute',bottom:0 }]}>
         <Text style={styles.headingBtn}>Log Out</Text>
       </TouchableOpacity>
     </ImageBackground>

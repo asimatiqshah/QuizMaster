@@ -12,22 +12,18 @@ import ScoreScreen from './src/components/ScoreScreen';
 import OTPScreen from './src/components/OTPScreen';
 import { useEffect, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Text, View } from 'react-native';
 
 
 const StackNav = createNativeStackNavigator();
-const Drawer = createDrawerNavigator();
-const DrawerNav = () => {
 
-  let { Navigator, Screen } = Drawer;
+// const Drawer = createDrawerNavigator();
+
+const DrawerNav = () => {
+  const DrawerMenu = createDrawerNavigator();
+  let { Navigator, Screen } = DrawerMenu;
   return (
-    <Navigator screenOptions={{ headerShown: false }}>
+    <Navigator>
       <Screen name="HomeScreen" component={HomeScreen} />
-      <Screen name="QuestionsScreen" component={QuestionsScreen} />
-      <Screen name="ScoreScreen" component={ScoreScreen} />
-      <Screen name="LoginForm" component={LoginForm} />
-      <Screen name="SignupForm" component={SignupForm} />
-      <Screen name="OTPScreen" component={OTPScreen} />
     </Navigator>
   )
 }
@@ -40,7 +36,7 @@ const App = () => {
     try {
       // const user_email = await AsyncStorage.getItem('userLogin_token');
       const token = await AsyncStorage.getItem('isLoggenIn');
-      console.log(token, "true check");
+      console.log(token);
       if (token) {
         // setIsLoggenIn({ user_email: JSON.parse(user_email), token: JSON.parse(token), navScreen: 'HomeScreen' });
         setIsLoggenIn(token);
@@ -55,27 +51,23 @@ const App = () => {
     // console.log(ref);
   }, []);
   return (
-
-
-    <>
-      <NavigationContainer>
-        {
-          isLoggenIn
-            ?
-            <DrawerNav />
-            :
-            <Navigator screenOptions={{ headerShown: false }}>
-              <Screen name="LoginForm" component={LoginForm} />
-              <Screen name="HomeScreen" component={HomeScreen} />
-              <Screen name="SignupForm" component={SignupForm} />
-              <Screen name="OTPScreen" component={OTPScreen} />
-            </Navigator>
-        }
-      </NavigationContainer>
-      <FlashMessage position="top" />
-    </>
-
-
+    <NavigationContainer>
+      {
+        isLoggenIn
+          ?
+          <Navigator screenOptions={{ headerShown: false }}>
+            <Screen name="HomeScreen" component={HomeScreen} />
+            <Screen name="LoginForm" component={LoginForm} />
+            <Screen name="SignupForm" component={SignupForm} />
+            <Screen name="OTPScreen" component={OTPScreen} />
+            <Screen name="QuestionsScreen" component={QuestionsScreen} />
+            <Screen name="LoginScreen" component={LoginScreen} />
+            <Screen name="ScoreScreen" component={ScoreScreen} />
+          </Navigator>
+          :
+          <DrawerNav />
+      }
+    </NavigationContainer>
   )
 
 };

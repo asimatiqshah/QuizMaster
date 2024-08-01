@@ -1,15 +1,14 @@
 import axios from 'axios';
 import React, { useState, useRef } from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
+import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
-const OTPScreen = ({navigation}) => {
-
+const OTPScreen = ({navigation,route}) => {
+  const { user } = route.params.params;
   const [otp1, setOtp1] = useState('');
   const [otp2, setOtp2] = useState('');
   const [otp3, setOtp3] = useState('');
   const [otp4, setOtp4] = useState('');
-
   const refInput2 = useRef(null);
   const refInput3 = useRef(null);
   const refInput4 = useRef(null);
@@ -87,6 +86,9 @@ const OTPScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.headingBtn}>Enter OTP</Text>
+      <Text style={styles.paragraph_heading}>Please enter the code we just sent to</Text>
+      <Text style={{color:'black',marginBottom:20}}>{user}</Text>
       <View style={styles.otpContainer}>
         <TextInput
           style={styles.input}
@@ -148,6 +150,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'black'
   },
+  headingBtn: {
+    fontSize: 26,
+    color: 'black',
+    marginBottom:5,
+    fontFamily: 'Artegra Soft Bold',
+  },
+  paragraph_heading: {
+    fontSize: 14,
+    color: '#808080',
+    marginBottom:5,
+    fontFamily: 'Artegra Soft Bold',
+  }
 });
 
 export default OTPScreen;
