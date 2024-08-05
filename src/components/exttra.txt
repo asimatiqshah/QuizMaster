@@ -1,32 +1,9 @@
-<View style={{flexBasis: '50%',alignItems:'center',paddingTop:45}}>
-          <ImageBackground
-            source={require('../images/knowladge.png')}
-            resizeMode="contain"
-            style={{
-              width: 156,
-              height: 152,
-              paddingHorizontal: 10,
-              paddingTop: 10,
-            }}>
-            <Image
-              source={require('../images/world.jpg')}
-              style={{
-                width: 80,
-                height: 51,
-                borderRadius: 10,
-                borderWidth: 2,
-                borderColor: '#fff',
-                alignSelf: 'flex-end',
-              }}
-            />
-            <Text style={styles.smallHeading}>Quiz</Text>
-            <Text style={styles.heading2}>General Knowladge</Text>
-          </ImageBackground>
-        </View>
-
-
-Back Btn
-===============
-<TouchableOpacity disabled={(currentPage + 1) >= question.length} onPress={()=>nextQuestions()}>
-              <Image source={require('../images/next.png')} style={{opacity: ((currentPage + 1) >= question.length)? 0.2 : 1}} />
-            </TouchableOpacity>
+      <View style={{
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1, backgroundColor: 'white',
+        display: isLoading ? 'block' : 'none'
+      }}>
+        <ActivityIndicator size="large" animating={isLoading} />
+      </View>
+      {/* Page Content */}

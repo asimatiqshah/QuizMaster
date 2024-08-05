@@ -1,9 +1,10 @@
 import axios from 'axios';
-import {useState} from 'react';
-import {Formik, Form, Field} from 'formik';
+import { useState } from 'react';
+import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import {showMessage, hideMessage} from 'react-native-flash-message';
+import { showMessage, hideMessage } from 'react-native-flash-message';
 import {
+  ActivityIndicator,
   Image,
   ImageBackground,
   Pressable,
@@ -35,13 +36,16 @@ const SignupSchema = Yup.object().shape({
       /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/,
       '"Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters',
     ),
-    confirmPassword: Yup.string()
+  confirmPassword: Yup.string()
     .min(8)
     .required('Please Provide Your Password')
-    .oneOf([Yup.ref('password')],'Passowrd Not Matched')
+    .oneOf([Yup.ref('password')], 'Passowrd Not Matched')
 });
 
-const SignupForm = ({navigation}) => {
+const SignupForm = ({ navigation }) => {
+
+  const [isLoading, setIsLoading] = useState(false);
+
   //Success Message
   const successShowMsg = () => {
     showMessage({
@@ -63,157 +67,170 @@ const SignupForm = ({navigation}) => {
 
   //handleSignupApi
   const handleSignup = async formdata => {
-    let newObj = {
-      name: formdata.name,
-      email: formdata.email,
-      password: formdata.password,
-      gender: radiaVal,
-      role: 'user',
-    };
-    console.log(newObj);
-    //Fetching Api
-    try {
-      let result = await axios.post(
-        'https://quiz-node-js.vercel.app/quiz/signup',
-        newObj,
-      );
-      if (result.data.status) {
-        successShowMsg();
-        setTimeout(() => {
-          navigation.navigate('OTPScreen',{
-            screen: 'OTPScreen',
-            params: { user: newObj.email },
-          });
-        }, 2000);
+      //Fetching Api
+      try {
+        let newObj = {
+          name: formdata.name.trim(),
+          email: formdata.email.trim(),
+          password: formdata.password.trim(),
+          gender: radiaVal,
+          role: 'user',
+        };
+          let result = await axios.post(
+            'https://quiz-node-js.vercel.app/quiz/signup',
+            newObj,
+          );
+          if (result.data.status) {
+            successShowMsg();
+            setTimeout(() => {
+              setIsLoading(false);
+              navigation.navigate('OTPScreen', {
+                screen: 'OTPScreen',
+                params: { user: newObj.email },
+              });
+            }, 1000);
+          }
+        
+      } catch (error) {
+        errorShowMsg(error.response.data);
+        console.log(error.response.data);
+        console.log(error);
+        setTimeout(()=>{
+          setIsLoading(false);
+        },1000)
       }
-    } catch (error) {
-      errorShowMsg(error.response.data);
-      console.log(error.response.data);
-      console.log(error);
-    }
+
   };
 
   //Radio Button Related
   const radioProps = [
-    {label: 'Male', value: 'male'},
-    {label: 'Female', value: 'female'},
+    { label: 'Male', value: 'male' },
+    { label: 'Female', value: 'female' },
   ];
   const [radiaVal, setRadiaVal] = useState('male');
   return (
-    <ScrollView style={styles.container}>
-      <ImageBackground
-        resizeMode="stretch"
-        source={require('../images/shape.png')}
-        style={{
-          width: '100%',
-          height: 160,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Text style={styles.displayHeading1}>Create Account</Text>
-        <Text style={styles.displayParagraph}>
-          Join Now and Challenge Your Mind!
-        </Text>
-      </ImageBackground>
-      <Formik
-        validationSchema={SignupSchema}
-        initialValues={{
-          name: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
-          role: '',
-        }}>
-        {({
-          values,
-          errors,
-          handleChange,
-          setFieldTouched,
-          isValid,
-          touched,
-        }) => (
-          <View>
-            <TextInput
-              value={values.name}
-              onBlur={()=>setFieldTouched('name')}
-              onChangeText={handleChange('name')}
-              autoCapitalize={false}
-              placeholder="Enter Your Name"
-              placeholderTextColor="#808080"
-              style={styles.inputStyle}
-            />
-            {  touched.name && errors.name && <Text style={styles.fault_red_16}>{errors.name}</Text>}
-            <TextInput
-              value={values.email}
-              onBlur={()=>setFieldTouched('email')}
-              onChangeText={handleChange('email')}
-              autoCapitalize={false}
-              placeholder="Email Address"
-              placeholderTextColor="#808080"
-              style={styles.inputStyle}
-            />
-            { touched.email && errors.email && <Text style={styles.fault_red_16}>{errors.email}</Text>}
-            <TextInput
-              value={values.password}
-              onBlur={()=>setFieldTouched('password')}
-              onChangeText={handleChange('password')}
-              autoCapitalize={false}
-              placeholder="Password"
-              placeholderTextColor="#808080"
-              style={styles.inputStyle}
-            />
-            { touched.password && errors.password && <Text style={styles.fault_red_16}>{errors.password}</Text>}
-            <TextInput
-              value={values.confirmPassword}
-              onBlur={()=>setFieldTouched('confirmPassword')}
-              onChangeText={handleChange('confirmPassword')}
-              autoCapitalize={false}
-              placeholder="Confirm Password"
-              placeholderTextColor="#808080"
-              style={styles.inputStyle}
-            />
-            { touched.confirmPassword && errors.confirmPassword && <Text style={styles.fault_red_16}>{errors.confirmPassword}</Text>}
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 20,
-              }}>
-              <Text style={[styles.displayParagraph, {marginBottom: 20}]}>
-                Please Select Your Gender
-              </Text>
-              <RadioForm
-                buttonSize={20}
-                buttonColor={'white'}
-                style={{paddingLeft: 50}}
-                labelStyle={{fontSize: 20, color: 'white', paddingRight: 50}}
-                radio_props={radioProps}
-                formHorizontal={true}
-                initial={0}
-                onPress={value => {
-                  setRadiaVal(value);
-                }}
+    <>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <ImageBackground
+          resizeMode="stretch"
+          source={require('../images/shape.png')}
+          style={{
+            width: '100%',
+            height: 160,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text style={styles.displayHeading1}>Create Account</Text>
+          <Text style={styles.displayParagraph}>
+            Join Now and Challenge Your Mind!
+          </Text>
+        </ImageBackground>
+        <Formik
+          validationSchema={SignupSchema}
+          initialValues={{
+            name: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+            role: '',
+          }}>
+          {({
+            values,
+            errors,
+            handleChange,
+            setFieldTouched,
+            isValid,
+            touched,
+          }) => (
+            <View>
+              <TextInput
+                value={values.name}
+                onBlur={() => setFieldTouched('name')}
+                onChangeText={handleChange('name')}
+                autoCapitalize={false}
+                placeholder="Enter Your Name"
+                placeholderTextColor="#808080"
+                style={styles.inputStyle}
               />
+              {touched.name && errors.name && <Text style={styles.fault_red_16}>{errors.name}</Text>}
+              <TextInput
+                value={values.email}
+                onBlur={() => setFieldTouched('email')}
+                onChangeText={handleChange('email')}
+                autoCapitalize={false}
+                placeholder="Email Address"
+                placeholderTextColor="#808080"
+                style={styles.inputStyle}
+              />
+              {touched.email && errors.email && <Text style={styles.fault_red_16}>{errors.email}</Text>}
+              <TextInput
+                value={values.password}
+                onBlur={() => setFieldTouched('password')}
+                onChangeText={handleChange('password')}
+                autoCapitalize={false}
+                placeholder="Password"
+                placeholderTextColor="#808080"
+                style={styles.inputStyle}
+              />
+              {touched.password && errors.password && <Text style={styles.fault_red_16}>{errors.password}</Text>}
+              <TextInput
+                value={values.confirmPassword}
+                onBlur={() => setFieldTouched('confirmPassword')}
+                onChangeText={handleChange('confirmPassword')}
+                autoCapitalize={false}
+                placeholder="Confirm Password"
+                placeholderTextColor="#808080"
+                style={styles.inputStyle}
+              />
+              {touched.confirmPassword && errors.confirmPassword && <Text style={styles.fault_red_16}>{errors.confirmPassword}</Text>}
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: 20,
+                }}>
+                <Text style={[styles.displayParagraph, { marginBottom: 20 }]}>
+                  Please Select Your Gender
+                </Text>
+                <RadioForm
+                  buttonSize={20}
+                  buttonColor={'white'}
+                  style={{ paddingLeft: 50 }}
+                  labelStyle={{ fontSize: 20, color: 'white', paddingRight: 50 }}
+                  radio_props={radioProps}
+                  formHorizontal={true}
+                  initial={0}
+                  onPress={value => {
+                    setRadiaVal(value);
+                  }}
+                />
+              </View>
+              <TouchableOpacity
+                disabled={!isValid}
+                onPress={() => {
+                  handleSignup(values);
+                  setIsLoading(true);
+                }}
+                style={[
+                  styles.darkBtn,
+                  { backgroundColor: isValid ? '#6949FE' : '#A5C9CA' },
+                ]}>
+                <Text style={styles.headingBtn}>Sign Up</Text>
+              </TouchableOpacity>
+              <View style={{display:isLoading ? 'block' : 'none'}}>
+                <ActivityIndicator size='large' animating={isLoading} />
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 20 }}>
+                <Text>Do you have account  — </Text>
+                <Pressable onPress={() => navigation.navigate('LoginForm')}>
+                  <Text style={{ color: '#1877F2', fontSize: 16 }}> Sign In</Text>
+                </Pressable>
+              </View>
             </View>
-            <TouchableOpacity
-              disabled={!isValid}
-              onPress={() => handleSignup(values)}
-              style={[
-                styles.darkBtn,
-                {backgroundColor: isValid ? '#6949FE' : '#A5C9CA'},
-              ]}>
-              <Text style={styles.headingBtn}>Sign Up</Text>
-            </TouchableOpacity>
-            <View style={{flexDirection:'row',justifyContent:'center',marginBottom:20}}>
-              <Text>Do you have account  — </Text>
-              <Pressable onPress={() => navigation.navigate('LoginForm')}>
-                <Text style={{color:'#1877F2',fontSize:16}}> Sign In</Text>
-              </Pressable>
-            </View>
-          </View>
-        )}
-      </Formik>
-    </ScrollView>
+          )}
+        </Formik>
+      </ScrollView>
+    </>
   );
 };
 export default SignupForm;
@@ -243,7 +260,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 30,
     alignSelf: 'center',
-    marginBottom:20
+    marginBottom: 20
   },
   headingBtn: {
     fontSize: 24,
@@ -263,11 +280,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     color: 'black',
   },
-  fault_red_16:{
-    marginTop:10,
-    fontSize:16,
-    color:'red',
-    paddingLeft:30,
+  fault_red_16: {
+    marginTop: 10,
+    fontSize: 16,
+    color: 'red',
+    paddingLeft: 30,
     fontFamily: 'Artegra Soft Bold'
   }
 });

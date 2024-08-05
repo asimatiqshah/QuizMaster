@@ -40,7 +40,6 @@ const App = () => {
     try {
       // const user_email = await AsyncStorage.getItem('userLogin_token');
       const token = await AsyncStorage.getItem('isLoggenIn');
-      console.log(token, "true check");
       if (token) {
         // setIsLoggenIn({ user_email: JSON.parse(user_email), token: JSON.parse(token), navScreen: 'HomeScreen' });
         setIsLoggenIn(token);

@@ -17,6 +17,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ScrollView,
+  KeyboardAvoidingView
 } from 'react-native';
 
 
@@ -31,23 +33,24 @@ const SigninSchema = Yup.object().shape({
 
 const LoginForm = ({ navigation }) => {
   const [formError, setFormError] = useState('');
-  const [isShow,setIsShow] = useState(true);
+  const [isShow, setIsShow] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const initialValues = {
     email: '',
     password: '',
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     getDataFromStorage();
-  },[]);
+  }, []);
 
-  const getDataFromStorage = async ()=>{
+  const getDataFromStorage = async () => {
     try {
-        const token = await AsyncStorage.getItem('isLoggenIn');
-        if(!token){
-          setIsShow(false);
-        }
+      const token = await AsyncStorage.getItem('isLoggenIn');
+      if (!token) {
+        setIsShow(false);
+      }
     } catch (error) {
       console.log(error, 'ERROR');
     }
@@ -74,6 +77,7 @@ const LoginForm = ({ navigation }) => {
   }
 
 
+
   const handlauthUser = async (formdata) => {
     let { email, password } = formdata;
     try {
@@ -84,6 +88,7 @@ const LoginForm = ({ navigation }) => {
       if (result.data.status) {
         storeUser(result);
         successShowMsg();
+        setIsLoading(false);
         // values.email='';
         // values.password='';
         navigation.navigate('HomeScreen');
@@ -91,126 +96,139 @@ const LoginForm = ({ navigation }) => {
     } catch (error) {
       console.log(error.response.data);
       setFormError(error.response.data.message);
+      setIsLoading(false);
       //Reference for handling error in async await : https://rapidapi.com/guides/handle-axios-errors
     }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={{display: isShow ? 'none':'true'}}>
-        <StatusBar barStyle="light-content" />
-        <ImageBackground
-          resizeMode="stretch"
-          source={require('../images/shape.png')}
-          style={{
-            width: '100%',
-            height: 300,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Image
-            source={require('../images/Quizzless.png')}
-            style={{ width: 198, height: 176 }}
-          />
-        </ImageBackground>
-        <View
-          style={{ marginTop: 20, justifyContent: 'center', alignItems: 'center' }}>
-          <Text style={styles.displayHeading1}>Sign in to continue</Text>
-        </View>
-        <Formik
-          initialValues={initialValues}
-          validationSchema={SigninSchema}
-        >
-          {({
-            values,
-            errors,
-            handleChange,
-            setFieldTouched,
-            isValid,
-            touched,
-            handleSubmit,
-            resetForm
-          }) => (
-            <View>
-              <TextInput
-                value={values.email}
-                onChangeText={handleChange('email')}
-                onBlur={() => setFieldTouched('email')}
-                autoCapitalize={false}
-                placeholder="Email Address"
-                placeholderTextColor="#808080"
-                style={{
-                  width: '85%',
-                  fontSize: 20,
-                  borderRadius: 10,
-                  alignSelf: 'center',
-                  paddingHorizontal: 20,
-                  marginTop: 30,
-                  height: 68,
-                  backgroundColor: 'white',
-                  borderColor: 'gray',
-                  borderWidth: 1,
-                  color: 'black',
-                }}
+    <>
+      <View style={{
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1, backgroundColor: 'white',
+        display: isLoading ? 'block' : 'none'
+      }}>
+        <ActivityIndicator size="large" animating={isLoading} />
+      </View>
+      {/* Page Content */}
+      <ScrollView automaticallyAdjustKeyboardInsets={true} showsVerticalScrollIndicator={false} style={[styles.container, { display: !isLoading ? 'block' : 'none' }]}>
+        <KeyboardAvoidingView>
+          <View style={{ display: isShow ? 'none' : 'true' }}>
+            <StatusBar barStyle="light-content" />
+            <ImageBackground
+              resizeMode="stretch"
+              source={require('../images/shape.png')}
+              style={{
+                width: '100%',
+                height: 300,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Image
+                source={require('../images/Quizzless.png')}
+                style={{ width: 198, height: 176 }}
               />
-              {touched.email && errors.email && <Text style={styles.fault_red_16}>{errors.email}</Text>}
-              <TextInput
-                value={values.password}
-                onChangeText={handleChange('password')}
-                onBlur={() => setFieldTouched('password')}
-                autoCapitalize={false}
-                placeholder="Password"
-                placeholderTextColor="#808080"
-                style={{
-                  width: '85%',
-                  fontSize: 20,
-                  borderRadius: 10,
-                  alignSelf: 'center',
-                  paddingHorizontal: 20,
-                  marginTop: 30,
-                  height: 68,
-                  backgroundColor: 'white',
-                  borderColor: 'gray',
-                  borderWidth: 1,
-                  color: 'black',
-                }}
-              />
-              {touched.password && errors.password && (
-                <Text style={styles.fault_red_16}>{errors.password}</Text>
-              )}
-              <TouchableOpacity
-                disabled={!isValid}
-                type="submit"
-                onPress={() => {
-                  handlauthUser(values),
-                    resetForm({
-                      values: {
-                        email: '',
-                        password: ''
-                      }
-                    })
-                }}
-                style={[styles.darkBtn, { backgroundColor: isValid ? '#6949FE' : '#A5C9CA' }]}>
-                <Text style={styles.headingBtn}>Sign In</Text>
-              </TouchableOpacity>
-
-
-
-              <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
-                <Text>Get started with us  — </Text>
-                <Pressable onPress={() => navigation.navigate('SignupForm')}>
-                  <Text style={{ color: '#1877F2', fontSize: 16 }}> Sign Up now!</Text>
-                </Pressable>
-              </View>
-              <Text style={styles.fault_red}>{formError}</Text>
+            </ImageBackground>
+            <View
+              style={{ marginTop: 20, justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={styles.displayHeading1}>Sign in to continue</Text>
             </View>
-          )}
-        </Formik>
-      </View>
-      <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-        <ActivityIndicator size='large' animating={isShow} />
-      </View>
-    </View>
+            <Formik
+              initialValues={initialValues}
+              validationSchema={SigninSchema}
+            >
+              {({
+                values,
+                errors,
+                handleChange,
+                setFieldTouched,
+                isValid,
+                touched,
+                handleSubmit,
+                resetForm
+              }) => (
+                <View>
+                  <TextInput
+                    value={values.email}
+                    onChangeText={handleChange('email')}
+                    onBlur={() => setFieldTouched('email')}
+                    autoCapitalize={false}
+                    placeholder="Email Address"
+                    placeholderTextColor="#808080"
+                    style={{
+                      width: '85%',
+                      fontSize: 20,
+                      borderRadius: 10,
+                      alignSelf: 'center',
+                      paddingHorizontal: 20,
+                      marginTop: 30,
+                      height: 68,
+                      backgroundColor: 'white',
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      color: 'black',
+                    }}
+                  />
+                  {touched.email && errors.email && <Text style={styles.fault_red_16}>{errors.email}</Text>}
+                  <TextInput
+                    value={values.password}
+                    onChangeText={handleChange('password')}
+                    onBlur={() => setFieldTouched('password')}
+                    autoCapitalize={false}
+                    placeholder="Password"
+                    placeholderTextColor="#808080"
+                    style={{
+                      width: '85%',
+                      fontSize: 20,
+                      borderRadius: 10,
+                      alignSelf: 'center',
+                      paddingHorizontal: 20,
+                      marginTop: 30,
+                      height: 68,
+                      backgroundColor: 'white',
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      color: 'black',
+                    }}
+                  />
+                  {touched.password && errors.password && (
+                    <Text style={styles.fault_red_16}>{errors.password}</Text>
+                  )}
+                  <TouchableOpacity
+                    disabled={!isValid}
+                    type="submit"
+                    onPress={() => {
+                      setIsLoading(true);
+                      handlauthUser(values),
+                        resetForm({
+                          values: {
+                            email: '',
+                            password: ''
+                          }
+                        })
+                    }}
+                    style={[styles.darkBtn, { backgroundColor: isValid ? '#6949FE' : '#A5C9CA' }]}>
+                    <Text style={styles.headingBtn}>Sign In</Text>
+                  </TouchableOpacity>
+
+                  <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
+                    <Text>Get started with us  — </Text>
+                    <Pressable onPress={() => navigation.navigate('SignupForm')}>
+                      <Text style={{ color: '#1877F2', fontSize: 16 }}> Sign Up now!</Text>
+                    </Pressable>
+                  </View>
+                  <Text style={styles.fault_red}>{formError}</Text>
+                </View>
+              )}
+            </Formik>
+          </View>
+        </KeyboardAvoidingView>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center',display:isShow?'block': 'none' }}>
+          <ActivityIndicator size='large' animating={isShow} />
+        </View>
+      </ScrollView>
+    </>
   );
 };
 export default LoginForm;
