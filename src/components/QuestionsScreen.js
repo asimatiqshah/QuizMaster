@@ -11,6 +11,9 @@ import {
   View,
 } from 'react-native';
 import CheckBox from 'react-native-check-box';
+
+let intervalTime;
+
 const QuestionsScreen = ({ route, navigation }) => {
   const { item } = route.params;
   const [question, setQuestion] = useState([]);
@@ -29,28 +32,41 @@ const QuestionsScreen = ({ route, navigation }) => {
   const estimateTime = useRef(null);
   useEffect(() => {
     fetchData();
-  }, []);
+    clearAllStates();
 
-  //Timer will in useEffect and attacted with useRef Hook to access every where in a component
+  }, [route]);
+
+  //Timer will in useEffect and attached with useRef Hook to access every where in a component
   useEffect(() => {
     if (isPaused == true) {
-      clearInterval(intervalRef.current);
-      console.log(trackReport);
       //Getting total time in which question complete
       estimateTimeHandler();
       //Total Score
       let totalResult = {
         trackReport: trackReport,
         total: question.length,
-        time: estimateTime.current
+        time: estimateTime.current,
+        category_id: item._id
       }
       estimateTime.current = 0;
       navigation.navigate('ScoreScreen', { totalResult });
     }
-    questionTimer();
 
   }, [isPaused])
 
+
+  const clearAllStates = () => {
+    console.log("Clear All States");
+    setQuestion([]);
+    setCurrentPage(0);
+    setUserVal({});
+    setTrackReport([]);
+    setIsActive(false);
+    setIsPaused(false);
+    setSecond('');
+    setMinute('');
+    setIsCheckboxbtn([false, false, false, false]);
+  }
 
   const estimateTimeHandler = () => {
     const now = new Date().getTime();
@@ -58,9 +74,8 @@ const QuestionsScreen = ({ route, navigation }) => {
     const finalMinute = Math.floor((result % (1000 * 60 * 60)) / (1000 * 60));
     const finalSecond = Math.floor((result % (1000 * 60)) / 1000);
     estimateTime.current = `${finalMinute <= 9 ? '0' + finalMinute : finalMinute}:${finalSecond <= 9 ? '0' + finalSecond : finalSecond}`;
-    console.log(estimateTime + " i am here");
   }
-
+  
   const fetchData = async () => {
     try {
       let result = await axios.post('https://quiz-node-js.vercel.app/quiz/category-related-questions', {
@@ -110,18 +125,21 @@ const QuestionsScreen = ({ route, navigation }) => {
         console.log("go");
         clearInterval(intervalRef.current);
         estimateTimeHandler();
-        console.log(estimateTime.current);
+        console.log(estimateTime.current + "Iam");
         //Total Score
         let totalResult = {
           trackReport: trackReport,
           total: question.length,
-          time: estimateTime.current
+          time: estimateTime.current,
+          category_id: item._id
         }
         navigation.navigate('ScoreScreen', { totalResult });
         //make variable clean
         startTime.current = 0;
         endTime.current = 0;
       }
+      // clearInterval(intervalRef.current);
+      console.log("I am reach");
     }
 
   }
@@ -133,34 +151,36 @@ const QuestionsScreen = ({ route, navigation }) => {
       setCurrentPage(prev);
     }
   }
-
-  const questionTimer = () => {
+  useEffect(() => {
     startTime.current = new Date().getTime(); //start time
     endTime.current = startTime.current + 60000; //end time
-
-    //suppose 
-    //endtime is 2 minutes
-    //now is 1 second ====> because interval run after every second so now is updated to one second
-    //formula   endTime - now ===> time should be minus in millisecond
+    //Implementing the setInterval method
     intervalRef.current = setInterval(() => {
+      //suppose 
+      //endtime is 2 minutes
+      //now is 1 second ====> because interval run after every second so now is updated to one second
+      //formula   endTime - now ===> time should be minus in millisecond
       const now = new Date().getTime();
       const result = endTime.current - now;
       if (result <= 0) {
         clearInterval(intervalRef.current);
         console.log("Timesup");
         setIsPaused(true);
-
       } else {
         //show time in easy format or human readable format
         //we will use formals 
-        const second = Math.floor((result % (1000 * 60)) / 1000);
-        const minute = Math.floor((result % (1000 * 60 * 60)) / (1000 * 60));
+        const second1 = Math.floor((result % (1000 * 60)) / 1000);
+        const minute1 = Math.floor((result % (1000 * 60 * 60)) / (1000 * 60));
         //put time into states
-        setSecond(second);
-        setMinute(minute);
+        setSecond(second1);
+        setMinute(minute1);
       }
-    }, 1000)
-  }
+    }, 1000);
+
+    //Clear Interval
+    return ()=> clearInterval(intervalRef.current);
+  }, [route])
+
 
   const renderItem = ({ item }) => {
     return (
@@ -169,20 +189,21 @@ const QuestionsScreen = ({ route, navigation }) => {
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <Text style={[styles.heading2, { color: '#37E9BB' }]}>0{currentPage + 1}/0{question.length}</Text>
             <Text style={{ fontSize: 16, color: 'red' }}>{minute <= 9 ? '0' + minute : minute}:{second <= 9 ? '0' + second : second}</Text>
+            
           </View>
           <Text style={styles.heading1}>{item.question}</Text>
         </View>
         <Image
- 
-           source={
-          (item.image)
-          ?
-          {
-            uri: `${item.image}`,
+
+          source={
+            (item.image)
+              ?
+              {
+                uri: `${item.image}`,
+              }
+              :
+              require('../images/ques.jpg')
           }
-          :
-          require('../images/ques.jpg')
-        }
           style={{
             width: 304,
             height: 214,

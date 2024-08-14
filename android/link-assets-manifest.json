@@ -1,0 +1,41 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/Artegra Soft Bold.ttf",
+      "sha1": "e23d065ca3ef374664a47a6268dcea9f5463235f"
+    },
+    {
+      "path": "assets/fonts/Artegra Soft Light.ttf",
+      "sha1": "0fff436d57510b127994c8c544b919ecfcd73170"
+    },
+    {
+      "path": "assets/fonts/Artegra Soft Medium.ttf",
+      "sha1": "1da6a2dda8be64b5ec6b34b29deec0caa3034750"
+    },
+    {
+      "path": "assets/fonts/Artegra Soft SemiBold.ttf",
+      "sha1": "44cf77320f7e8e97fbbca938343fd3d8ffc1d990"
+    },
+    {
+      "path": "assets/fonts/ArtegraSoft-Bold.ttf",
+      "sha1": "e23d065ca3ef374664a47a6268dcea9f5463235f"
+    },
+    {
+      "path": "assets/fonts/ArtegraSoft-Light.ttf",
+      "sha1": "0fff436d57510b127994c8c544b919ecfcd73170"
+    },
+    {
+      "path": "assets/fonts/ArtegraSoft-Medium.ttf",
+      "sha1": "1da6a2dda8be64b5ec6b34b29deec0caa3034750"
+    },
+    {
+      "path": "assets/fonts/Playwrite ES Deco ExtraLight.ttf",
+      "sha1": "bf2bb4961a7018e78877d2dd52c8a5d719a84385"
+    },
+    {
+      "path": "assets/fonts/Playwrite ES Deco.ttf",
+      "sha1": "25afd3722c74c19c182edeb711a2cc73412b6802"
+    }
+  ]
+}

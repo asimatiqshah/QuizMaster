@@ -11,13 +11,14 @@ import {
   View,
 } from 'react-native';
 
+
 const HomeScreen = ({ navigation }) => {
   const [title, setTitle] = useState([]);
-  const [isShow,setIsShow] = useState(true);
+  const [isShow, setIsShow] = useState(true);
   useEffect(() => {
     console.log("Working");
-    
     fetchData();
+    getDataFromStorage();
   }, []);
 
   const fetchData = async () => {
@@ -25,17 +26,26 @@ const HomeScreen = ({ navigation }) => {
       let result = await axios.get(
         'https://quiz-node-js.vercel.app/quiz/categoryShow',
       );
-      if(result.data.status){
+      if (result.data.status) {
         setIsShow(false);
         setTitle(result.data.data);
       }
-      
+
     } catch (error) {
       console.log(error.response.data);
     }
   };
 
-  const logOutHandler = async ()=>{
+  const getDataFromStorage= async ()=>{
+    try {
+      const token = await AsyncStorage.getItem('userLogin_token');
+      console.log(token);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const logOutHandler = async () => {
     try {
       await AsyncStorage.removeItem('userLogin_token');
       await AsyncStorage.removeItem('isLoggenIn');
@@ -50,9 +60,32 @@ const HomeScreen = ({ navigation }) => {
       source={require('../images/fullimage.jpg')}
       resizeMode="cover"
       style={styles.bg_full}>
-      <View style={{ paddingHorizontal: 25, marginBottom: 40, marginTop: 30 }}>
+      <View style={styles.profileBar}>
+        <View style={styles.box_1}>
+          <View>
+            <View style={styles.circle}>
+              <Image source={require('../images/profile-dp.jpg')} style={{width:40,height:40,borderRadius:1000}} />
+            </View>
+          </View>
+          <View>
+            <Text style={styles.profile_paragraph}>Pamela Rois</Text>
+            <Text style={styles.profile_heading2}>1005</Text>
+          </View>
+        </View>
+        <View style={[styles.box_2,{alignItems:'center'}]}>
+        <View>
+            {/* <View style={styles.circle} /> */}
+            <Image source={require('../images/rankStar.png')} style={{width:50,height:50}} />
+          </View>
+          <View>
+            <Text style={styles.profile_paragraph}>Rank</Text>
+            <Text style={styles.profile_heading2}>2250</Text>
+          </View>
+        </View>
+      </View>
+      <View style={{ paddingHorizontal: 25, marginBottom: 40, marginTop: 0 }}>
         <Text style={styles.displayHeading1}>Category</Text>
-        <Text style={styles.heading2}>Choose a category to start playing</Text>
+        <Text style={styles.heading67}>Choose a category to start playing</Text>
       </View>
       <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
         {/* Box 1*/}
@@ -82,8 +115,9 @@ const HomeScreen = ({ navigation }) => {
                   paddingHorizontal: 10,
                   paddingTop: 10,
                 }}>
+                  
                 <Image
-                  source={require('../images/world.jpg')}
+                  source={require('../images/quiz_img_02.png')}
                   style={{
                     width: 80,
                     height: 51,
@@ -101,11 +135,11 @@ const HomeScreen = ({ navigation }) => {
         })}
       </View>
       <View>
-        <ActivityIndicator size="large" animating={isShow}   />
+        <ActivityIndicator size="large" animating={isShow} />
       </View>
       <TouchableOpacity
         onPress={logOutHandler}
-        style={[styles.darkBtn, { backgroundColor: '#6949FE',marginBottom:20,alignSelf:'center',position:'absolute',bottom:0 }]}>
+        style={[styles.darkBtn, { backgroundColor: '#6949FE', marginBottom: 20, alignSelf: 'center', position: 'absolute', bottom: 0 }]}>
         <Text style={styles.headingBtn}>Log Out</Text>
       </TouchableOpacity>
     </ImageBackground>
@@ -123,7 +157,7 @@ const styles = StyleSheet.create({
   displayHeading1: {
     fontSize: 40,
     color: 'white',
-    fontFamily: 'Artegra Soft Bold',
+    fontFamily: 'ArtegraSoft-Bold',
   },
   smallHeading: {
     fontSize: 16,
@@ -138,8 +172,14 @@ const styles = StyleSheet.create({
   heading2: {
     fontSize: 20,
     color: 'white',
-    fontFamily: 'Artegra Soft Bold',
+    fontFamily: 'ArtegraSoft-Bold',
   },
+  heading67: {
+    fontSize: 20,
+    color: 'white',
+    fontFamily: 'ArtegraSoft-Light',
+  }
+  ,
   darkBtn: {
     width: 295,
     height: 68,
@@ -170,4 +210,45 @@ const styles = StyleSheet.create({
     color: 'white',
     fontFamily: 'Artegra Soft Bold',
   },
+  profileBar: {
+    flexDirection: 'row',
+    backgroundColor: '#3A1F7F',
+    width: '90%',
+    height: 60,
+    alignItems:'center',
+    alignSelf:'center',
+    borderRadius: 1000,
+    marginVertical:25,
+    borderWidth: 1,
+    borderColor: "thistle",
+  },
+  circle: {
+    height: 40,
+    width: 40,
+    borderRadius: 1000,
+    backgroundColor: 'blue',
+    marginRight: 10
+  },
+  profile_heading2: {
+    fontSize: 16,
+    color: 'white',
+    fontFamily: 'Artegra Soft Bold',
+  },
+  profile_paragraph: {
+    fontSize: 14,
+    color: 'white',
+    fontFamily: 'Artegra Soft Bold',
+  },
+  box_1: {
+    flex:1,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingLeft:10
+  },
+  box_2: {
+    flex:1,
+    flexDirection: 'row',
+    justifyContent:'flex-end',
+    paddingRight:10
+  }
 });

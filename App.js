@@ -68,6 +68,8 @@ const App = () => {
               <Screen name="HomeScreen" component={HomeScreen} />
               <Screen name="SignupForm" component={SignupForm} />
               <Screen name="OTPScreen" component={OTPScreen} />
+              <Screen name="ScoreScreen" component={ScoreScreen} />
+              <Screen name="QuestionsScreen" component={QuestionsScreen} />
             </Navigator>
         }
       </NavigationContainer>
