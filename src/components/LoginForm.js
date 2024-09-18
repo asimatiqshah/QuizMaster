@@ -91,7 +91,7 @@ const LoginForm = ({ navigation }) => {
         setIsLoading(false);
         // values.email='';
         // values.password='';
-        navigation.navigate('HomeScreen');
+        navigation.navigate('AppContainer');
       }
     } catch (error) {
       console.log(error.response.data);

@@ -1,9 +1,0 @@
-      <View style={{
-        justifyContent: 'center',
-        alignItems: 'center',
-        flex: 1, backgroundColor: 'white',
-        display: isLoading ? 'block' : 'none'
-      }}>
-        <ActivityIndicator size="large" animating={isLoading} />
-      </View>
-      {/* Page Content */}

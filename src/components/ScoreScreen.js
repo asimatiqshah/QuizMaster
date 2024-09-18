@@ -7,6 +7,7 @@ const ScoreScreen = ({ route, navigation }) => {
     //const [userID,setuserID] = useState();
     const [count,setCount] = useState(0);
     const [isActive,setIsActive] = useState(false);
+    const [userID,setUserID] = useState(null);
     const { totalResult } = route.params;
 
     //Run getDataFromStorage
@@ -48,6 +49,7 @@ const ScoreScreen = ({ route, navigation }) => {
                 );
                 if(result.data.status){
                     let { _id } = result.data.data;
+                    setUserID(_id);
                     if(count == 0){
                         saveRecordsInDatabase(_id);
                     }
@@ -81,13 +83,14 @@ const ScoreScreen = ({ route, navigation }) => {
     //Save Data In Database
     const saveRecordsInDatabase = async (_id) => {
         let newObj = {
-            user_id:"66a9b9d097becff8bf842214",
+            user_id:userID,
             category_id: totalResult.category_id,
             attempted_questions : totalResult.trackReport.length.toString(),
             score_secured : findSecuredMarks.toString(),
             time_spend : totalResult.time.toString(),
             status : findCorrectAnswer >= 3 ? 'Passed':'Failed'
         }
+        console.log(newObj);
        try {
         if(newObj.user_id !== '' && newObj.attempted_questions !== '' && newObj.score_secured !== '' && newObj.time_spend !== '' && newObj.status !== '' ){
             let result = await axios.post('https://quiz-node-js.vercel.app/quiz/progressRecords',newObj);
@@ -95,7 +98,7 @@ const ScoreScreen = ({ route, navigation }) => {
             setCount(count + 1);
         }
        } catch (error) {
-        console.log(error + "IN ScoreScreen SaveRecordsInDatabase")
+        console.log(error)
        }
     }
 
@@ -113,7 +116,7 @@ const ScoreScreen = ({ route, navigation }) => {
             <Text style={styles.smallHeading}>Time Spent :<Text style={{ color: '#37E9BB' }} > {totalResult.time}</Text></Text>
             <TouchableOpacity
                 onPress={() => {
-                    navigation.navigate('HomeScreen');
+                    navigation.navigate('AppContainer');
                 }}
                 style={[styles.darkBtn, { backgroundColor: '#6949FE' }]}>
                 <Text style={styles.headingBtn}>Go To Menu</Text>

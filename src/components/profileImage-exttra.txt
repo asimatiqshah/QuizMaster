@@ -1,0 +1,44 @@
+    const handleUserProfile = async() => {
+
+        // let newObj1 = {
+        //     name: form.name,
+        //     email: form.email,
+        //     password: form.password,
+        //     gender: (radiaVal == null) ? userdata.gender : radiaVal,
+        //     role:"user"
+        // }
+        
+        // For Files
+        let newObj={
+            uri:imagePath,
+            name:imageName,
+            type:imageMime
+        }
+        //For Gender
+        const gender = (radiaVal == null) ? userdata.gender : radiaVal;
+        const formData = new FormData();
+        formData.append('name',form.name);
+        formData.append('email',form.email);
+        formData.append('password',form.password);
+        formData.append('gender',gender);
+        formData.append('role',"user");
+        if(imagePath !== null){formData.append('image',newObj);}
+
+        try {
+            let result = await axios.post('http://192.168.0.103:8080/quiz/updateUser',formData,{
+                headers: {
+                    'Accept':'application/json',
+                    'content-type': 'multipart/form-data'
+                }
+            });
+            console.log(result.data.data);
+            if(result.data.data.hasOwnProperty('userimage')){
+                setProfileImage(result.data.data.userimage);
+            }
+            
+
+        } catch (error) {
+            console.log(error.response.data);
+        }
+
+    }

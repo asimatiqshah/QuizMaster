@@ -15,6 +15,7 @@ import {
 const HomeScreen = ({ navigation }) => {
   const [title, setTitle] = useState([]);
   const [isShow, setIsShow] = useState(true);
+  const [userInfo,setUserInfo] = useState(null);
   useEffect(() => {
     console.log("Working");
     fetchData();
@@ -40,6 +41,11 @@ const HomeScreen = ({ navigation }) => {
     try {
       const token = await AsyncStorage.getItem('userLogin_token');
       console.log(token);
+      let result = await axios.post('https://quiz-node-js.vercel.app/quiz/userIndividualDetail',{email:JSON.parse(token)});
+      console.log(result.data.data);
+      if(result.data.status){
+        setUserInfo(result.data.data);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -64,22 +70,24 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.box_1}>
           <View>
             <View style={styles.circle}>
-              <Image source={require('../images/profile-dp.jpg')} style={{width:40,height:40,borderRadius:1000}} />
+              {
+                (userInfo)
+                ?
+                <Image source={{uri:userInfo.userimage}} style={{width:40,height:40,borderRadius:1000}} />
+                :
+                <Image source={require('../images/avatar.png')} style={{width:40,height:40,borderRadius:1000}} />
+              }
             </View>
           </View>
           <View>
-            <Text style={styles.profile_paragraph}>Pamela Rois</Text>
-            <Text style={styles.profile_heading2}>1005</Text>
+            <Text style={styles.profile_paragraph}>{userInfo && userInfo.name}</Text>
+            <Text style={{fontSize:12,color:'#5CE65C'}}>Online</Text>
           </View>
         </View>
         <View style={[styles.box_2,{alignItems:'center'}]}>
         <View>
             {/* <View style={styles.circle} /> */}
             <Image source={require('../images/rankStar.png')} style={{width:50,height:50}} />
-          </View>
-          <View>
-            <Text style={styles.profile_paragraph}>Rank</Text>
-            <Text style={styles.profile_heading2}>2250</Text>
           </View>
         </View>
       </View>

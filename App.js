@@ -13,7 +13,7 @@ import OTPScreen from './src/components/OTPScreen';
 import { useEffect, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text, View } from 'react-native';
-
+import AppContainer from './src/components/AppContainer';
 
 const StackNav = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -22,6 +22,7 @@ const DrawerNav = () => {
   let { Navigator, Screen } = Drawer;
   return (
     <Navigator screenOptions={{ headerShown: false }}>
+      <Screen name="AppContainer" component={AppContainer} />
       <Screen name="HomeScreen" component={HomeScreen} />
       <Screen name="QuestionsScreen" component={QuestionsScreen} />
       <Screen name="ScoreScreen" component={ScoreScreen} />
@@ -70,6 +71,7 @@ const App = () => {
               <Screen name="OTPScreen" component={OTPScreen} />
               <Screen name="ScoreScreen" component={ScoreScreen} />
               <Screen name="QuestionsScreen" component={QuestionsScreen} />
+              <Screen name="AppContainer" component={AppContainer} />
             </Navigator>
         }
       </NavigationContainer>
