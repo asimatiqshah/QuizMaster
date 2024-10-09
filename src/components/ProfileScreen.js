@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ActivityIndicator, Alert, Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import ImagePicker from 'react-native-image-crop-picker';
 import RadioForm, {
@@ -9,11 +9,10 @@ import RadioForm, {
 } from 'react-native-simple-radio-button';
 import { useEffect, useState } from "react";
 import axios from 'axios';
-import { ScrollView } from 'react-native-gesture-handler';
 import { showMessage, hideMessage } from 'react-native-flash-message';
 import { Formik, Form, Field, FormikContext } from 'formik';
 import * as Yup from 'yup';
-
+import { CommonActions } from '@react-navigation/native';
 const ProfileScreen = ({ navigation }) => {
     //Radio Button Related
     const radioProps = [
@@ -141,11 +140,25 @@ const ProfileScreen = ({ navigation }) => {
         }
     }
 
+    //Log Out Handler
+    //////////////////////////
+    const logOutHandler = async () => {
+        try {
+          await AsyncStorage.removeItem('userLogin_token');
+          await AsyncStorage.removeItem('isLoggenIn');
+          navigation.dispatch(CommonActions.reset({
+            index:0,
+            routes:[{name:'LoginForm'}]
+          }));
+        } catch (error) {
+          console.log(error);
+        }
+    }
+
     const handleUserProfile = async (form_values, resetForm) => {
 
         /** Image Upload through json **/
         /** ==================================================  **/
-
         //For Gender
         const gender = (radiaVal == null) ? userdata.gender : radiaVal;
         let newObj = {
@@ -170,13 +183,24 @@ const ProfileScreen = ({ navigation }) => {
 
         try {
             let result = await axios.post('https://quiz-node-js.vercel.app/quiz/updateUser', newObj);
-            console.log(result.data.data);
             if (result.data.data.hasOwnProperty('userimage')) {
                 setProfileImage(result.data.data.userimage);
             }
-            setTimeout(() => {
-                successShowMsg("Data Added Sucessfully");
-            }, 1000);
+            if(result.data.data.password !== userdata.password){
+                //if password does not match! it means passwords are different
+                setTimeout(() => {
+                    successShowMsg("Data Added Sucessfully");
+                    logOutHandler();
+                }, 1000);
+            }else{
+                setTimeout(() => {
+                    successShowMsg("Data Added Sucessfully");
+                    navigation.dispatch(CommonActions.reset({
+                        index:0,
+                        routes:[{name:'HomeScreen'}]
+                    }))
+                }, 1000);
+            }
             setIsShow(false);
             setPageReferesh(true);
         } catch (error) {
@@ -202,7 +226,7 @@ const ProfileScreen = ({ navigation }) => {
                     initialValues={{
                         name: userdata ? userdata.name : '',
                         email: userdata ? userdata.email : '',
-                        password: userdata ? userdata.password : '',
+                        password: userdata ? atob(userdata.password) : '',
                         imagetwo : '',
                         role: 'user',
                     }}>
@@ -354,7 +378,6 @@ const ProfileScreen = ({ navigation }) => {
                                 style={[styles.darkBtn, { opacity: isShow ? 0.5 : 1, backgroundColor: dirty ? '#6949FE' : '#808080', alignSelf: 'center' }]}>
                                 {isShow ? <ActivityIndicator /> : <Text style={styles.headingBtn}>Save</Text>}
                             </TouchableOpacity>
-                            <Text>{`${pageReferesh}`}</Text>
                         </View>
                     )}
                 </Formik>
@@ -376,7 +399,7 @@ const ProfileScreen = ({ navigation }) => {
                                 keyboardType='default' />
                             <TouchableOpacity
                                 onPress={() => {
-                                    if (confirmPassword == userdata.password) {
+                                    if (confirmPassword == atob(userdata.password)) {
                                         setShowPassword(false);
                                     }
                                     setIsModal(false);

@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text, View } from 'react-native';
 import AppContainer from './src/components/AppContainer';
+import SplashScreen from 'react-native-splash-screen';
 
 const StackNav = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -34,6 +35,14 @@ const DrawerNav = () => {
 }
 
 const App = () => {
+
+  //Code For Splash Screen
+  useEffect(()=>{
+    setTimeout(()=>{
+      SplashScreen.hide();
+    },500)
+  },[]);
+
   const [isLoggenIn, setIsLoggenIn] = useState(false);
   let { Navigator, Screen } = StackNav;
   //getData
@@ -55,8 +64,6 @@ const App = () => {
     // console.log(ref);
   }, []);
   return (
-
-
     <>
       <NavigationContainer>
         {
@@ -77,8 +84,6 @@ const App = () => {
       </NavigationContainer>
       <FlashMessage position="top" />
     </>
-
-
   )
 
 };

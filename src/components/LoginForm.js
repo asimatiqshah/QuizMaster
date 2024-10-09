@@ -4,6 +4,8 @@ import * as Yup from 'yup';
 import { useEffect, useRef, useState } from 'react';
 import { showMessage, hideMessage } from 'react-native-flash-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { addEventListener } from "@react-native-community/netinfo";
 import {
   ActivityIndicator,
   Alert,
@@ -20,6 +22,9 @@ import {
   ScrollView,
   KeyboardAvoidingView
 } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { increment, networkStatus, oldNetworkStatusHandler } from '../redux/reducers/connectionSlice';
+import { useIsFocused } from '@react-navigation/native';
 
 
 const SigninSchema = Yup.object().shape({
@@ -35,6 +40,43 @@ const LoginForm = ({ navigation }) => {
   const [formError, setFormError] = useState('');
   const [isShow, setIsShow] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(true);
+  const [hideNetworkStatusBar, setHideNetworkStatusBar] = useState('block');
+  const [reLoadingPage, setReLoadingPage] = useState(true);
+  const [whiteScreenShow,setWhiteScreenShow] = useState(false);
+
+
+  const isFocused = useIsFocused();
+
+  const dispatch = useDispatch();
+  const isConnectedStatus = useSelector(({ connectionSlice }) => connectionSlice.isConnected);
+  //Internet Connection UseEffect
+  useEffect(() => {
+    let timeoutId;
+    setWhiteScreenShow(false);
+    // Subscribe
+    const unsubscribe = addEventListener(state => {
+      if (state.isConnected == true) {
+        setHideNetworkStatusBar('none');
+        setReLoadingPage(true);
+      } else {
+        setHideNetworkStatusBar('block');
+        setReLoadingPage(false);
+        setWhiteScreenShow(true);
+      }
+      dispatch(networkStatus(state.isConnected));
+    });
+
+    return () => {
+      // Clear Timout
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      // Unsubscribe
+      unsubscribe();
+    }
+  },[isFocused]);
+
 
   const initialValues = {
     email: '',
@@ -43,7 +85,7 @@ const LoginForm = ({ navigation }) => {
 
   useEffect(() => {
     getDataFromStorage();
-  }, []);
+  }, [reLoadingPage]);
 
   const getDataFromStorage = async () => {
     try {
@@ -79,6 +121,10 @@ const LoginForm = ({ navigation }) => {
 
 
   const handlauthUser = async (formdata) => {
+
+    // //check internet connection
+    // if(!isConnectedStatus)return false;
+
     let { email, password } = formdata;
     try {
       let result = await axios.post('https://quiz-node-js.vercel.app/quiz/login', {
@@ -107,12 +153,24 @@ const LoginForm = ({ navigation }) => {
         justifyContent: 'center',
         alignItems: 'center',
         flex: 1, backgroundColor: 'white',
-        display: isLoading ? 'block' : 'none'
+        position:'absolute',
+        width:'100%',
+        height:'100%',
+        zIndex:2,
+        display:whiteScreenShow?'block':'none'
       }}>
-        <ActivityIndicator size="large" animating={isLoading} />
+        <Text style={{color:'black'}}>Check Your Internet Connection</Text>
+        <TouchableOpacity onPress={()=>{
+          if(isConnectedStatus){
+            setReLoadingPage(true);
+          setWhiteScreenShow(false);
+          }
+        }}>
+          <Text style={{color:'blue',fontSize:20}}>Reload</Text>
+        </TouchableOpacity>
       </View>
       {/* Page Content */}
-      <ScrollView automaticallyAdjustKeyboardInsets={true} showsVerticalScrollIndicator={false} style={[styles.container, { display: !isLoading ? 'block' : 'none' }]}>
+      <ScrollView automaticallyAdjustKeyboardInsets={true} showsVerticalScrollIndicator={false} style={[styles.container]}>
         <KeyboardAvoidingView>
           <View style={{ display: isShow ? 'none' : 'true' }}>
             <StatusBar barStyle="light-content" />
@@ -149,49 +207,47 @@ const LoginForm = ({ navigation }) => {
                 resetForm
               }) => (
                 <View>
-                  <TextInput
-                    value={values.email}
-                    onChangeText={handleChange('email')}
-                    onBlur={() => setFieldTouched('email')}
-                    autoCapitalize={false}
-                    placeholder="Email Address"
-                    placeholderTextColor="#808080"
-                    style={{
-                      width: '85%',
-                      fontSize: 20,
-                      borderRadius: 10,
-                      alignSelf: 'center',
-                      paddingHorizontal: 20,
-                      marginTop: 30,
-                      height: 68,
-                      backgroundColor: 'white',
-                      borderColor: 'gray',
-                      borderWidth: 1,
-                      color: 'black',
-                    }}
-                  />
+                  <View style={{ flexDirection: 'row', width: '85%', height: 68, marginTop: 30, borderRadius: 10, backgroundColor: 'white', paddingHorizontal: 20, alignItems: 'center', alignSelf: 'center' }}>
+                    <TextInput
+                      value={values.email}
+                      onChangeText={handleChange('email')}
+                      onBlur={() => setFieldTouched('email')}
+                      autoCapitalize={false}
+                      placeholder="Email Address"
+                      placeholderTextColor="#808080"
+                      style={{
+                        fontSize: 20,
+                        borderColor: 'white',
+                        borderWidth: 1,
+                        color: 'black',
+                        flex: 1,
+                        height: 60
+                      }}
+                    />
+                  </View>
                   {touched.email && errors.email && <Text style={styles.fault_red_16}>{errors.email}</Text>}
-                  <TextInput
-                    value={values.password}
-                    onChangeText={handleChange('password')}
-                    onBlur={() => setFieldTouched('password')}
-                    autoCapitalize={false}
-                    placeholder="Password"
-                    placeholderTextColor="#808080"
-                    style={{
-                      width: '85%',
-                      fontSize: 20,
-                      borderRadius: 10,
-                      alignSelf: 'center',
-                      paddingHorizontal: 20,
-                      marginTop: 30,
-                      height: 68,
-                      backgroundColor: 'white',
-                      borderColor: 'gray',
-                      borderWidth: 1,
-                      color: 'black',
-                    }}
-                  />
+                  <View style={{ flexDirection: 'row', width: '85%', height: 68, marginTop: 30, borderRadius: 10, backgroundColor: 'white', paddingHorizontal: 20, alignItems: 'center', alignSelf: 'center' }}>
+                    <TextInput
+                      value={values.password}
+                      onChangeText={handleChange('password')}
+                      onBlur={() => setFieldTouched('password')}
+                      autoCapitalize={false}
+                      placeholder="Password"
+                      secureTextEntry={showPassword}
+                      placeholderTextColor="#808080"
+                      style={{
+                        fontSize: 20,
+                        borderColor: 'white',
+                        borderWidth: 1,
+                        color: 'black',
+                        flex: 1,
+                        height: 60
+                      }}
+                    />
+                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                      <MaterialIcons name="remove-red-eye" color={showPassword ? 'black' : 'red'} size={20} />
+                    </TouchableOpacity>
+                  </View>
                   {touched.password && errors.password && (
                     <Text style={styles.fault_red_16}>{errors.password}</Text>
                   )}
@@ -208,9 +264,10 @@ const LoginForm = ({ navigation }) => {
                           }
                         })
                     }}
-                    style={[styles.darkBtn, { backgroundColor: isValid ? '#6949FE' : '#A5C9CA' }]}>
+                    style={[styles.darkBtn, { backgroundColor: isValid ? '#6949FE' : '#A5C9CA', display: isLoading ? 'none' : 'block' }]}>
                     <Text style={styles.headingBtn}>Sign In</Text>
                   </TouchableOpacity>
+                  <Text style={{ display: isLoading ? 'block' : 'none', alignSelf: 'center', color: '#32de84', fontSize: 16, marginTop: 10 }}>Loading...</Text>
 
                   <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
                     <Text>Get started with us  — </Text>
@@ -224,10 +281,13 @@ const LoginForm = ({ navigation }) => {
             </Formik>
           </View>
         </KeyboardAvoidingView>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center',display:isShow?'block': 'none' }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', display: isShow ? 'block' : 'none' }}>
           <ActivityIndicator size='large' animating={isShow} />
         </View>
       </ScrollView>
+      <View style={{ backgroundColor: isConnectedStatus ? 'green' : 'black', bottom: 0, height: 30, width: '100%', justifyContent: 'center', alignItems: 'center', display: hideNetworkStatusBar }}>
+        <Text style={{ color: 'white' }}>{isConnectedStatus && isConnectedStatus ? 'Back Online' : 'No Internet'}</Text>
+      </View>
     </>
   );
 };

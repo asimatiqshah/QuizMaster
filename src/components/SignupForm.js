@@ -66,7 +66,7 @@ const SignupForm = ({ navigation }) => {
   };
 
   //handleSignupApi
-  const handleSignup = async formdata => {
+  const handleSignup = async (formdata,resetForm) => {
       //Fetching Api
       try {
         let newObj = {
@@ -83,6 +83,7 @@ const SignupForm = ({ navigation }) => {
           if (result.data.status) {
             successShowMsg();
             setTimeout(() => {
+              resetForm();
               setIsLoading(false);
               navigation.navigate('OTPScreen', {
                 screen: 'OTPScreen',
@@ -92,9 +93,8 @@ const SignupForm = ({ navigation }) => {
           }
         
       } catch (error) {
-        errorShowMsg(error.response.data);
-        console.log(error.response.data);
-        console.log(error);
+        errorShowMsg(error?.response?.data || error);
+        console.log(error.message);
         setTimeout(()=>{
           setIsLoading(false);
         },1000)
@@ -141,6 +141,7 @@ const SignupForm = ({ navigation }) => {
             setFieldTouched,
             isValid,
             touched,
+            resetForm
           }) => (
             <View>
               <TextInput
@@ -170,6 +171,7 @@ const SignupForm = ({ navigation }) => {
                 autoCapitalize={false}
                 placeholder="Password"
                 placeholderTextColor="#808080"
+                secureTextEntry={true}
                 style={styles.inputStyle}
               />
               {touched.password && errors.password && <Text style={styles.fault_red_16}>{errors.password}</Text>}
@@ -180,6 +182,7 @@ const SignupForm = ({ navigation }) => {
                 autoCapitalize={false}
                 placeholder="Confirm Password"
                 placeholderTextColor="#808080"
+                secureTextEntry={true}
                 style={styles.inputStyle}
               />
               {touched.confirmPassword && errors.confirmPassword && <Text style={styles.fault_red_16}>{errors.confirmPassword}</Text>}
@@ -208,7 +211,7 @@ const SignupForm = ({ navigation }) => {
               <TouchableOpacity
                 disabled={!isValid}
                 onPress={() => {
-                  handleSignup(values);
+                  handleSignup(values,resetForm);
                   setIsLoading(true);
                 }}
                 style={[

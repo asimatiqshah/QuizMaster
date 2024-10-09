@@ -11,6 +11,9 @@ import {
   View,
 } from 'react-native';
 import CheckBox from 'react-native-check-box';
+import { addEventListener } from "@react-native-community/netinfo";
+import { useDispatch, useSelector } from 'react-redux';
+import { increment, networkStatus, oldNetworkStatusHandler } from '../redux/reducers/connectionSlice';
 
 let intervalTime;
 
@@ -30,11 +33,42 @@ const QuestionsScreen = ({ route, navigation }) => {
   const startTime = useRef(null);
   const endTime = useRef(null);
   const estimateTime = useRef(null);
+  const [hideNetworkStatusBar, setHideNetworkStatusBar] = useState('block');
   useEffect(() => {
     fetchData();
     clearAllStates();
-
   }, [route]);
+
+  const dispatch = useDispatch();
+  const isConnectedStatus = useSelector(({ connectionSlice }) => connectionSlice.isConnected);
+  //Internet Connection UseEffect
+  useEffect(() => {
+    let timeoutId;
+    // Subscribe
+    const unsubscribe = addEventListener(state => {
+      // console.log("Connection type", state.type);
+      if (isConnectedStatus == false && state.isConnected == true) {
+        timeoutId = setTimeout(() => {
+          setHideNetworkStatusBar('none');
+        }, 6000);
+      } else if (isConnectedStatus == true && state.isConnected == true) {
+        setHideNetworkStatusBar('none');
+      } else {
+        setHideNetworkStatusBar('block');
+        navigation.navigate('AppContainer');
+      }
+      dispatch(networkStatus(state.isConnected));
+    });
+
+    return () => {
+      // Clear Timout
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      // Unsubscribe
+      unsubscribe();
+    }
+  },[]);
 
   //Timer will in useEffect and attached with useRef Hook to access every where in a component
   useEffect(() => {
@@ -56,7 +90,6 @@ const QuestionsScreen = ({ route, navigation }) => {
 
 
   const clearAllStates = () => {
-    console.log("Clear All States");
     setQuestion([]);
     setCurrentPage(0);
     setUserVal({});
@@ -89,7 +122,6 @@ const QuestionsScreen = ({ route, navigation }) => {
 
   const handleCheckBoxVal = (id, answer, marks, indexNumber) => {
     setIsActive(true);
-    console.log(id, answer, marks, indexNumber);
     setUserVal({ id, answer, marks });
     const clone = [false, false, false, false];
     clone.splice(indexNumber, 1, true);
@@ -107,6 +139,7 @@ const QuestionsScreen = ({ route, navigation }) => {
   }
 
   const nextQuestions = () => {
+  
     if (isActive) {
       // console.log(userVal,trackReport,isActive);
       //Put Selected Answer in trackReport
@@ -115,17 +148,14 @@ const QuestionsScreen = ({ route, navigation }) => {
         ...trackReport
       ]);
       setIsActive(false);
-      console.log(trackReport);
       //Check Next Page
       if ((currentPage + 1) < question.length) {
         const next = currentPage + 1;
         setCurrentPage(next);
         setIsCheckboxbtn([false, false, false, false]);
       } else if ((currentPage + 1) == question.length) {
-        console.log("go");
         clearInterval(intervalRef.current);
         estimateTimeHandler();
-        console.log(estimateTime.current + "Iam");
         //Total Score
         let totalResult = {
           trackReport: trackReport,
@@ -139,7 +169,6 @@ const QuestionsScreen = ({ route, navigation }) => {
         endTime.current = 0;
       }
       // clearInterval(intervalRef.current);
-      console.log("I am reach");
     }
 
   }
@@ -153,7 +182,7 @@ const QuestionsScreen = ({ route, navigation }) => {
   }
   useEffect(() => {
     startTime.current = new Date().getTime(); //start time
-    endTime.current = startTime.current + 60000; //end time
+    endTime.current = startTime.current + 240000; //end time
     //Implementing the setInterval method
     intervalRef.current = setInterval(() => {
       //suppose 
@@ -164,7 +193,7 @@ const QuestionsScreen = ({ route, navigation }) => {
       const result = endTime.current - now;
       if (result <= 0) {
         clearInterval(intervalRef.current);
-        console.log("Timesup");
+        // console.log("Timesup");
         setIsPaused(true);
       } else {
         //show time in easy format or human readable format
@@ -181,13 +210,12 @@ const QuestionsScreen = ({ route, navigation }) => {
     return ()=> clearInterval(intervalRef.current);
   }, [route])
 
-
   const renderItem = ({ item }) => {
     return (
       <View>
         <View style={{ paddingHorizontal: 25, marginBottom: 20, marginTop: 30 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Text style={[styles.heading2, { color: '#37E9BB' }]}>0{currentPage + 1}/0{question.length}</Text>
+            <Text style={[styles.heading2, { color: '#37E9BB' }]}>{currentPage + 1}/{question.length}</Text>
             <Text style={{ fontSize: 16, color: 'red' }}>{minute <= 9 ? '0' + minute : minute}:{second <= 9 ? '0' + second : second}</Text>
             
           </View>
@@ -220,7 +248,7 @@ const QuestionsScreen = ({ route, navigation }) => {
           {
             item.options.map((record, index) => {
               return (
-                <View key={index} style={{ flexDirection: 'row', paddingVertical: 10, paddingHorizontal: 25, justifyContent: 'center', alignItems: 'center' }}>
+                <View key={index} style={{ flexDirection: 'row', paddingVertical: 10, justifyContent: 'flex-start', alignItems: 'center',paddingLeft:20,paddingRight:70 }}>
                   <Image
                     source={require('../images/num_01.png')}
                     style={{ width: 24, height: 24 }}
@@ -260,6 +288,9 @@ const QuestionsScreen = ({ route, navigation }) => {
         </View>
 
       </ImageBackground>
+      <View style={{ backgroundColor: isConnectedStatus ? 'green' : 'black', bottom: 0, height: 30, width: '100%', justifyContent: 'center', alignItems: 'center', display: hideNetworkStatusBar }}>
+        <Text style={{ color: 'white' }}>{isConnectedStatus && isConnectedStatus ? 'Back Online' : 'No Internet'}</Text>
+      </View>
     </>
 
   );
@@ -294,7 +325,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Artegra Soft Bold',
   },
   heading3: {
-    fontSize: 22,
+    fontSize: 20,
     color: 'white',
     fontFamily: 'Artegra Soft Bold',
   }

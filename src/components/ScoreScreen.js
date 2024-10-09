@@ -13,16 +13,10 @@ const ScoreScreen = ({ route, navigation }) => {
     //Run getDataFromStorage
     useEffect(() =>{
         getDataFromStorage();
-        // console.log(count);
-        // if(count == 0){
-        // console.log("googing");
-        // // setCount(count + 1);
-        // }
     });
 
     useEffect(()=>{
         setCount(0);
-        console.log("Running");
     },[totalResult])
 
     //Run saveRecordsInDatabase
@@ -90,11 +84,9 @@ const ScoreScreen = ({ route, navigation }) => {
             time_spend : totalResult.time.toString(),
             status : findCorrectAnswer >= 3 ? 'Passed':'Failed'
         }
-        console.log(newObj);
        try {
         if(newObj.user_id !== '' && newObj.attempted_questions !== '' && newObj.score_secured !== '' && newObj.time_spend !== '' && newObj.status !== '' ){
             let result = await axios.post('https://quiz-node-js.vercel.app/quiz/progressRecords',newObj);
-            console.log(result.data);
             setCount(count + 1);
         }
        } catch (error) {

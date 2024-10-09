@@ -34,13 +34,11 @@ const OTPScreen = ({navigation,route}) => {
 
   const handleVerifyOTP = async () => {
     const otpcode = otp1 + otp2 + otp3 + otp4;
-    console.log('Verifying OTP:', otpcode);
+    // console.log('Verifying OTP:', otpcode);
     // Here you can add your logic to verify OTP
     let newObj = {
       otpcode
     }
-    console.log(newObj);
-
     try {
       let result = await axios.post('https://quiz-node-js.vercel.app/quiz/verifyEmail', newObj);
       successShowMsg();
